@@ -1,0 +1,10 @@
+src/components/ProtectedRoute.tsx(11,19): error TS6133: 'isLoading' is declared but its value is never read.
+src/components/TeamViewModal.tsx(86,55): error TS2339: Property 'isReferrer' does not exist on type 'Partial<Investor>'.
+src/components/TeamViewModal.tsx(115,58): error TS2339: Property 'isReferrer' does not exist on type 'Partial<Investor>'.
+src/pages/AdminSalesHistory.tsx(22,18): error TS2554: Expected 1-2 arguments, but got 0.
+src/pages/AdminSalesHistory.tsx(38,11): error TS6133: 'isLoading' is declared but its value is never read.
+src/pages/CreateInvestor.tsx(34,17): error TS2353: Object literal may only specify known properties, and 'isReferrer' does not exist in type 'Omit<Investor, "_id">'.
+src/pages/CreateSalesAccount.tsx(24,18): error TS2554: Expected 1-2 arguments, but got 0.
+src/pages/ManageBranches.tsx(36,18): error TS2554: Expected 1-2 arguments, but got 0.
+src/pages/ManageBranches.tsx(90,22): error TS2554: Expected 1-2 arguments, but got 0.
+src/pages/SuperAdmin.tsx(16,18): error TS2554: Expected 1-2 arguments, but got 0.
