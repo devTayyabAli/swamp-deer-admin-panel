@@ -104,4 +104,8 @@ export interface PaginatedResponse<T> {
     total: number;
     totalAmountInvested?: number;
     totalRewardPaid?: number;
+    summary?: {
+        totalAmount: number;
+        totalProfit: number;
+    };
 }

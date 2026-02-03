@@ -32,7 +32,8 @@ const SuperAdmin = () => {
 
     // Filtered sales for metrics
     const completedSales = (sales || []).filter(s => s.status === 'completed');
-    const rejectedSalesCount = (sales || []).filter(s => s.status === 'rejected').length;
+    // Hide rejected sales from calculations and lists
+    const nonRejectedSales = (sales || []).filter(s => s.status !== 'rejected');
 
     const highestProfitBranch = sortedByProfit[0];
     const mostInvestorsBranch = sortedByInvestors[0];
@@ -91,18 +92,7 @@ const SuperAdmin = () => {
                         </div>
                     </div>
 
-                    {/* Rejected Transactions Card */}
-                    <div className="bg-white p-5 rounded-[20px] border border-border-light shadow-sm flex flex-col justify-between group hover:shadow-lg transition-all duration-300 relative overflow-hidden h-32">
-                        <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/5 rounded-full -mr-12 -mt-12 transition-transform group-hover:scale-110"></div>
-                        <div className="relative z-10">
-                            <div className="text-gray-400 text-[9px] font-black uppercase tracking-[0.2em] mb-1 opacity-70">Rejected Transactions</div>
-                            <div className="text-2xl font-black text-red-600 tracking-tighter">{rejectedSalesCount}</div>
-                        </div>
-                        <div className="flex items-center justify-between relative z-10">
-                            <span className="px-2 py-0.5 rounded-lg bg-red-500/10 text-red-600 text-[8px] font-black uppercase tracking-widest border border-red-500/10">Action Required</span>
-                            <span className="material-symbols-outlined text-red-500/40 text-lg group-hover:rotate-12 transition-transform">block</span>
-                        </div>
-                    </div>
+
                 </div>
             </div>
 
@@ -181,7 +171,7 @@ const SuperAdmin = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border-light/50">
-                                {sales.slice(0, 5).map((sale) => (
+                                {nonRejectedSales.slice(0, 5).map((sale) => (
                                     <tr key={sale._id} className="hover:bg-neutral-light transition-colors group">
                                         <td className="px-6 py-5 text-sm text-gray-500 font-medium whitespace-nowrap">
                                             {new Date(sale.date || sale.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}

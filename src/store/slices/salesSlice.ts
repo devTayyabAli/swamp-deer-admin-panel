@@ -9,6 +9,10 @@ interface SalesState {
         pages: number;
         total: number;
     };
+    summary: {
+        totalAmount: number;
+        totalProfit: number;
+    };
     isLoading: boolean;
     error: string | null;
 }
@@ -20,14 +24,18 @@ const initialState: SalesState = {
         pages: 1,
         total: 0
     },
+    summary: {
+        totalAmount: 0,
+        totalProfit: 0
+    },
     isLoading: false,
     error: null,
 };
 
 export const fetchSales = createAsyncThunk(
     'sales/fetchAll',
-    async ({ page = 1, limit = 10, branchId, startDate, endDate, status }: { 
-        page?: number; 
+    async ({ page = 1, limit = 10, branchId, startDate, endDate, status }: {
+        page?: number;
         limit?: number;
         branchId?: string;
         startDate?: string;
@@ -85,6 +93,7 @@ const salesSlice = createSlice({
                 pages: action.payload.pages,
                 total: action.payload.total
             };
+            state.summary = action.payload.summary || { totalAmount: 0, totalProfit: 0 };
         });
         builder.addCase(fetchSales.rejected, (state, action) => {
             state.isLoading = false;

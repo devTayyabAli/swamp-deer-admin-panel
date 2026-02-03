@@ -7,7 +7,7 @@ import { fetchBranches } from '../store/slices/branchSlice';
 
 const AdminSalesHistory = () => {
     const dispatch = useDispatch<AppDispatch>();
-    const { items: sales, pagination } = useSelector((state: RootState) => state.sales);
+    const { items: sales, pagination, summary } = useSelector((state: RootState) => state.sales);
     const { items: branches } = useSelector((state: RootState) => state.branches);
 
     // Filtering and Pagination state
@@ -38,7 +38,8 @@ const AdminSalesHistory = () => {
 
 
     // Use items directly since backend now handles filtering
-    const displaySales = sales;
+    // Filter out rejected sales as they should not be shown in the admin panel
+    const displaySales = sales.filter(s => s.status !== 'rejected');
 
     // if (isLoading && sales.length === 0) return <div>Loading history...</div>;
 
@@ -108,7 +109,6 @@ const AdminSalesHistory = () => {
                             <option value="All">All Statuses</option>
                             <option value="Pending">Pending</option>
                             <option value="Completed">Completed</option>
-                            <option value="Rejected">Rejected</option>
                         </select>
                     </div>
 
@@ -127,6 +127,35 @@ const AdminSalesHistory = () => {
                             Reset Filters
                         </button>
                     )}
+                </div>
+            </div>
+
+            {/* Summary Statistics - Refined UI */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-white p-4 rounded-2xl border border-border-light shadow-lg hover:shadow-forest-green/5 transition-all group relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-16 h-16 bg-forest-green/5 rounded-full -mr-8 -mt-8"></div>
+                    <div className="flex items-start justify-between relative z-10">
+                        <div>
+                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.15em] mb-1">Total Turnover</p>
+                            <h3 className="text-xl font-black text-forest-green tracking-tight">Rs {summary?.totalAmount?.toLocaleString() || '0'}</h3>
+                        </div>
+                        <div className="p-2 bg-emerald-50 rounded-xl">
+                            <span className="material-symbols-outlined text-forest-green text-sm">analytics</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-white p-4 rounded-2xl border border-border-light shadow-lg hover:shadow-warm-gold/5 transition-all group relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-16 h-16 bg-warm-gold/5 rounded-full -mr-8 -mt-8"></div>
+                    <div className="flex items-start justify-between relative z-10">
+                        <div>
+                            <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.15em] mb-1">Net Yield</p>
+                            <h3 className="text-xl font-black text-swamp-deer tracking-tight">Rs {summary?.totalProfit?.toLocaleString() || '0'}</h3>
+                        </div>
+                        <div className="p-2 bg-amber-50 rounded-xl">
+                            <span className="material-symbols-outlined text-warm-gold text-sm">trending_up</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 

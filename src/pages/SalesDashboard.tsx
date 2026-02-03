@@ -11,9 +11,12 @@ const SalesDashboard = () => {
         dispatch(fetchSales({}));
     }, [dispatch]);
 
+    // Filtered sales for display and stats
+    const activeSales = (sales || []).filter(s => s.status !== 'rejected');
+
     // Derived stats
-    const totalAmount = sales.reduce((acc, curr) => acc + curr.amount, 0);
-    const totalCommission = sales.reduce((acc, curr) => acc + curr.commission, 0);
+    const totalAmount = activeSales.reduce((acc, curr) => acc + curr.amount, 0);
+    const totalCommission = activeSales.reduce((acc, curr) => acc + curr.commission, 0);
     const stats = { totalAmount, totalCommission };
 
     if (isLoading && sales.length === 0) {
@@ -71,12 +74,12 @@ const SalesDashboard = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border-light">
-                            {sales.length === 0 ? (
+                            {activeSales.length === 0 ? (
                                 <tr>
                                     <td colSpan={5} className="px-6 py-4 text-center text-gray-500">No sales found. Start by logging a new sale!</td>
                                 </tr>
                             ) : (
-                                sales.map((sale) => (
+                                activeSales.map((sale) => (
                                     <tr key={sale._id} className="hover:bg-neutral-light transition-colors">
                                         <td className="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">
                                             {new Date(sale.date || sale.createdAt).toLocaleDateString()}
