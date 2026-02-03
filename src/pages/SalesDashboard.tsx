@@ -27,7 +27,7 @@ const SalesDashboard = () => {
                     <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Branch Dashboard</h1>
                     <p className="text-gray-500 text-sm mt-1">Welcome back. Here's your sales overview.</p>
                 </div>
-                <button onClick={() => window.location.href='/log-sale'} className="w-full sm:w-auto bg-deep-green text-white px-6 py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-forest-green transition-all shadow-lg shadow-deep-green/10">
+                <button onClick={() => window.location.href = '/log-sale'} className="w-full sm:w-auto bg-deep-green text-white px-6 py-3 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-forest-green transition-all shadow-lg shadow-deep-green/10">
                     <span className="material-symbols-outlined">add_circle</span>
                     Log New Sale
                 </button>
@@ -40,7 +40,7 @@ const SalesDashboard = () => {
                             <span className="material-symbols-outlined text-deep-green">trending_up</span>
                         </div>
                     </div>
-                    <h3 className="text-3xl sm:text-4xl font-bold text-warm-gold">${stats.totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</h3>
+                    <h3 className="text-3xl sm:text-4xl font-bold text-warm-gold">Rs {stats.totalAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</h3>
                     <p className="text-sm text-emerald-600 mt-2 font-medium">Lifetime total</p>
                 </div>
                 <div className="bg-white p-6 rounded-xl border border-border-light shadow-sm">
@@ -50,7 +50,7 @@ const SalesDashboard = () => {
                             <span className="material-symbols-outlined text-warm-gold">payments</span>
                         </div>
                     </div>
-                    <h3 className="text-3xl sm:text-4xl font-bold text-warm-gold">${stats.totalCommission.toLocaleString('en-US', { minimumFractionDigits: 2 })}</h3>
+                    <h3 className="text-3xl sm:text-4xl font-bold text-warm-gold">Rs {stats.totalCommission.toLocaleString('en-US', { minimumFractionDigits: 2 })}</h3>
                     <p className="text-sm text-emerald-600 mt-2 font-medium">Lifetime total</p>
                 </div>
             </div>
@@ -90,8 +90,8 @@ const SalesDashboard = () => {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{sale.description}</td>
-                                        <td className="px-6 py-4 text-sm font-bold text-gray-900">${sale.amount.toLocaleString()}</td>
-                                        <td className="px-6 py-4 text-sm font-bold text-warm-gold text-right">${sale.commission.toLocaleString()}</td>
+                                        <td className="px-6 py-4 text-sm font-bold text-gray-900">Rs {sale.amount.toLocaleString()}</td>
+                                        <td className="px-6 py-4 text-sm font-bold text-warm-gold text-right">Rs {sale.commission.toLocaleString()}</td>
                                     </tr>
                                 ))
                             )}

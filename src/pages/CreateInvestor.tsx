@@ -119,24 +119,24 @@ const CreateInvestor = () => {
                             ></textarea>
                         </div>
                     </div>
+                </div>
 
-                    <div className="pt-10 border-t border-[#f0f4f2] flex flex-col-reverse sm:flex-row items-center justify-between gap-6 sm:gap-0">
-                        <button
-                            type="button"
-                            onClick={() => navigate('/manage-investors')}
-                            className="text-[10px] font-black text-gray-400 hover:text-swamp-deer uppercase tracking-[0.25em] transition-colors"
-                        >
-                            Cancel and Return
-                        </button>
-                        <button
-                            onClick={handleSubmit}
-                            disabled={isSubmitting}
-                            className="w-full sm:w-auto flex items-center justify-center gap-4 px-12 py-5 rounded-2xl bg-swamp-deer hover:bg-forest-green text-white text-[10px] font-black uppercase tracking-[0.3em] transition-all shadow-2xl shadow-swamp-deer/30 disabled:opacity-50 group/btn active:scale-95"
-                        >
-                            <span>{isSubmitting ? 'Processing...' : 'Deploy Profile'}</span>
-                            <span className="material-symbols-outlined text-sm group-hover:translate-x-1.5 transition-transform">rocket_launch</span>
-                        </button>
-                    </div>
+                <div className="pt-10 border-t border-[#f0f4f2] flex flex-col-reverse sm:flex-row items-center justify-between gap-6 sm:gap-0">
+                    <button
+                        type="button"
+                        onClick={() => navigate('/manage-investors')}
+                        className="text-[10px] font-black text-gray-400 hover:text-swamp-deer uppercase tracking-[0.25em] transition-colors"
+                    >
+                        Cancel and Return
+                    </button>
+                    <button
+                        onClick={handleSubmit}
+                        disabled={isSubmitting}
+                        className="w-full sm:w-auto flex items-center justify-center gap-4 px-12 py-5 rounded-2xl bg-swamp-deer hover:bg-forest-green text-white text-[10px] font-black uppercase tracking-[0.3em] transition-all shadow-2xl shadow-swamp-deer/30 disabled:opacity-50 group/btn active:scale-95"
+                    >
+                        <span>{isSubmitting ? 'Processing...' : 'Deploy Profile'}</span>
+                        <span className="material-symbols-outlined text-sm group-hover:translate-x-1.5 transition-transform">rocket_launch</span>
+                    </button>
                 </div>
             </div>
         </div>

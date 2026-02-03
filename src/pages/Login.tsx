@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import logo from '../assets/logo.png';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -32,7 +33,7 @@ const Login = () => {
         <div className="w-full max-w-[480px] bg-white dark:bg-[#1a2e21] rounded-xl shadow-xl border border-gray-100 dark:border-emerald-900/20 overflow-hidden">
           <div className="px-6 sm:px-8 pt-10 pb-12 flex flex-col">
             <div className="mb-8 flex flex-col items-center">
-              <img src="/src/assets/logo.png" alt="SalesPro Logo" className="h-16 w-auto object-contain mb-6" />
+              <img src={logo} alt="SalesPro Logo" className="h-16 w-auto object-contain mb-6" />
               <h1 className="text-[#111813] dark:text-white tracking-light text-2xl sm:text-[32px] font-bold leading-tight text-center pb-2">Welcome Back</h1>
             </div>
             <form className="space-y-4" onSubmit={handleSubmit}>
@@ -79,11 +80,11 @@ const Login = () => {
         </div>
       </main>
       <footer className="py-6 text-center text-[#61896f] dark:text-emerald-400/50 text-xs px-4">
-        <p>© 2024 SalesPro Management Systems. All rights reserved.</p>
-        <div className="flex justify-center gap-4 mt-2">
+        <p>© {new Date().getFullYear()} Swamp Deer. All rights reserved.</p>
+        {/* <div className="flex justify-center gap-4 mt-2">
           <a className="hover:text-primary" href="#">Privacy Policy</a>
           <a className="hover:text-primary" href="#">Terms of Service</a>
-        </div>
+        </div> */}
       </footer>
     </div>
   );

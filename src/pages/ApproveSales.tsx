@@ -90,7 +90,7 @@ const ApproveSales = () => {
                                         <td className="px-6 py-5 whitespace-nowrap">
                                             <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{sale.paymentMethod}</span>
                                         </td>
-                                        <td className="px-6 py-5 text-sm font-black text-forest-green">${sale.amount.toLocaleString()}</td>
+                                        <td className="px-6 py-5 text-sm font-black text-forest-green">Rs {sale.amount.toLocaleString()}</td>
                                         <td className="px-6 py-5 text-right whitespace-nowrap space-x-2">
                                             <button
                                                 disabled={!!isUpdating}

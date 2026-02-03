@@ -11,6 +11,8 @@ export interface User {
     token?: string;
     status?: 'active' | 'banned';
     isBanned?: boolean;
+    profitRate?: number;
+    commissionRate?: number;
 }
 
 export interface Branch {
@@ -40,6 +42,8 @@ export interface Investor {
     totalReward?: number;
     createdAt?: string;
     isReferrer?: boolean;
+    profitRate?: number;
+    commissionRate?: number;
 }
 
 export interface Sale {

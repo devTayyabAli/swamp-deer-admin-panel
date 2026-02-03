@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import logo from '../assets/logo.png';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
@@ -34,7 +35,7 @@ const AdminLogin = () => {
         <div className="px-10 py-12 flex flex-col items-center">
 
           <div className="mb-8 flex flex-col items-center">
-            <img src="/src/assets/logo.png" alt="SalesPro Logo" className="h-16 w-auto object-contain mb-4" />
+            <img src={logo} alt="SalesPro Logo" className="h-16 w-auto object-contain mb-4" />
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#D4AF37] mb-1">Secure Access</span>
             <h1 className="text-[#0a2e1e] tracking-tight text-xl font-black uppercase">Super Admin Dashboard</h1>
           </div>

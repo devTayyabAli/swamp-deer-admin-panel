@@ -186,10 +186,10 @@ const AdminSalesHistory = () => {
                                                 {sale.status}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-5 text-sm font-black text-forest-green">${sale.amount.toLocaleString()}</td>
+                                        <td className="px-6 py-5 text-sm font-black text-forest-green">Rs {sale.amount.toLocaleString()}</td>
                                         <td className="px-6 py-5 text-sm font-black text-swamp-deer text-right">
                                             <span className="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-[11px]">
-                                                +${(sale.amount - sale.commission).toLocaleString()}
+                                                +Rs {(sale.amount - sale.commission).toLocaleString()}
                                             </span>
                                         </td>
                                     </tr>

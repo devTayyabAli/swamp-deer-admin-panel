@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { Menu, X, Pin, PinOff, ChevronDown, ChevronRight } from 'lucide-react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import logo from '../assets/logo.png';
 
 const SidebarGroup = ({ label, icon, children, isOpen, onToggle, isSidebarPinned }: {
     label: string,
@@ -93,7 +94,7 @@ const AdminLayout = () => {
                 <div className="h-full flex flex-col overflow-hidden">
                     <div className="h-16 flex items-center justify-between px-6 bg-black/10 shrink-0">
                         <div className="flex items-center gap-2 overflow-hidden">
-                            <img src="/src/assets/logo.png" alt="SalesPro Logo" className="h-8 w-auto object-contain" />
+                            <img src={logo} alt="SalesPro Logo" className="h-8 w-auto object-contain" />
                             <h2 className={clsx(
                                 "text-xl font-bold tracking-tight whitespace-nowrap transition-opacity duration-300",
                                 !isSidebarPinned && "lg:opacity-0 lg:group-hover:opacity-100"
@@ -211,7 +212,7 @@ const AdminLayout = () => {
                         "p-6 text-xs text-gray-500 bg-black/5 whitespace-nowrap transition-opacity duration-300 shrink-0",
                         !isSidebarPinned && "lg:opacity-0 lg:group-hover:opacity-100"
                     )}>
-                        © 2024 SalesPro
+                        © {new Date().getFullYear()} Swamp Deer
                     </div>
                 </div>
             </aside>

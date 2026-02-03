@@ -202,7 +202,7 @@ const ManageBranches = () => {
                                     </td>
                                     <td className="px-6 py-6">
                                         <span className="text-base font-black text-gray-900 tracking-tight">
-                                            ${(branch.totalSalesAmount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                            Rs {(branch.totalSalesAmount || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                         </span>
                                     </td>
                                     <td className="px-6 py-6">
