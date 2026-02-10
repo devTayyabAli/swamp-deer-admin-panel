@@ -10,7 +10,6 @@ interface ProtectedRouteProps {
 const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
     const { user } = useAuth();
     const location = useLocation();
-
     // if (isLoading) {
     //     // You might want a nicer loading spinner here
     //     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
@@ -24,7 +23,7 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
         return <Navigate to="/" state={{ from: location }} replace />;
     }
 
-    if (allowedRoles && !allowedRoles.includes(user.role)) {
+    if (allowedRoles && !allowedRoles.includes(user?.role)) {
         // Role based protection
         // If user is logged in but tries to access restricted area, redirect to their dashboard or unauthorized page
         // For now, redirecting to dashboard if they are a regular user trying to access admin

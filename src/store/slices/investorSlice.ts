@@ -30,9 +30,9 @@ const initialState: InvestorState = {
 
 export const fetchInvestors = createAsyncThunk(
     'investors/fetchAll',
-    async ({ page = 1, limit = 10, startDate, endDate }: { page?: number; limit?: number; startDate?: string; endDate?: string } = {}, { rejectWithValue }) => {
+    async ({ page = 1, limit = 10, startDate, endDate, search }: { page?: number; limit?: number; startDate?: string; endDate?: string; search?: string } = {}, { rejectWithValue }) => {
         try {
-            return await getInvestors(page, limit, { startDate, endDate });
+            return await getInvestors(page, limit, { startDate, endDate, search });
         } catch (error: unknown) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             return rejectWithValue((error as any).response?.data?.message || 'Failed to fetch investors');

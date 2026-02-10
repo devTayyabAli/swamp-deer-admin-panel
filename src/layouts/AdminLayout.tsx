@@ -149,6 +149,14 @@ const AdminLayout = () => {
                                 <span className="material-symbols-outlined text-sm">gavel</span>
                                 <span>Approve Sales</span>
                             </NavLink>
+                            <NavLink to="/approve-rewards" className={({ isActive }) => navLinkClasses({ isActive }, true)}>
+                                <span className="material-symbols-outlined text-sm">emoji_events</span>
+                                <span>Approve Rewards</span>
+                            </NavLink>
+                            <NavLink to="/approve-withdrawals" className={({ isActive }) => navLinkClasses({ isActive }, true)}>
+                                <span className="material-symbols-outlined text-sm">payments</span>
+                                <span>Withdrawals</span>
+                            </NavLink>
                         </SidebarGroup>
 
                         {/* Creation Hub */}

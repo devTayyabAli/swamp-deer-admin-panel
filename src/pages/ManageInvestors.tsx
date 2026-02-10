@@ -195,13 +195,17 @@ const ManageInvestors = () => {
     }, [dateFilter]);
 
     useEffect(() => {
-        dispatch(fetchInvestors({
-            page: currentPage,
-            limit: 10,
-            startDate,
-            endDate
-        }));
-    }, [dispatch, currentPage, startDate, endDate]);
+        const timer = setTimeout(() => {
+            dispatch(fetchInvestors({
+                page: currentPage,
+                limit: 10,
+                startDate,
+                endDate,
+                search: searchTerm
+            }));
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [dispatch, currentPage, startDate, endDate, searchTerm]);
 
     const handleToggleStatus = async (id: string) => {
         try {
@@ -250,11 +254,7 @@ const ManageInvestors = () => {
 
     const isLoading = isInvestorsLoading && (investors || []).length === 0;
 
-    const filteredInvestors = (investors || []).filter(inv =>
-        inv.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        inv.phone.includes(searchTerm) ||
-        inv.email?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const displayInvestors = investors || [];
 
     if (isLoading) {
         return (
@@ -403,7 +403,7 @@ const ManageInvestors = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border-light">
-                                {filteredInvestors.map((investor) => (
+                                {displayInvestors.map((investor) => (
                                     <tr key={investor._id} className="hover:bg-neutral-light/50 transition-colors group">
                                         <td className="px-6 py-4">
                                             <div className="font-bold text-gray-900 leading-tight">{investor.fullName}</div>
@@ -474,7 +474,7 @@ const ManageInvestors = () => {
                                 ))}
                             </tbody>
                         </table>
-                        {filteredInvestors.length === 0 && (
+                        {displayInvestors.length === 0 && (
                             <div className="p-20 text-center border-t border-border-light flex flex-col items-center gap-3">
                                 <span className="material-symbols-outlined text-4xl text-gray-200">person_off</span>
                                 <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest italic">No investor records found match your search criteria</p>

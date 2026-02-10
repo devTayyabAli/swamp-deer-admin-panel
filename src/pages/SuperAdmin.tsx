@@ -171,7 +171,7 @@ const SuperAdmin = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border-light/50">
-                                {nonRejectedSales.slice(0, 5).map((sale) => (
+                                {nonRejectedSales?.slice(0, 5)?.map((sale) => (
                                     <tr key={sale._id} className="hover:bg-neutral-light transition-colors group">
                                         <td className="px-6 py-5 text-sm text-gray-500 font-medium whitespace-nowrap">
                                             {new Date(sale.date || sale.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
@@ -185,7 +185,7 @@ const SuperAdmin = () => {
                                             </div>
                                         </td>
                                         <td className="px-6 py-5 text-sm font-bold text-gray-600 whitespace-nowrap">
-                                            {typeof sale.branchId === 'object' ? sale.branchId.name : (branches.find(b => b._id === sale.branchId)?.name || "N/A")}
+                                            {typeof sale?.branchId === 'object' ? sale?.branchId?.name : (branches?.find(b => b._id === sale?.branchId)?.name || "N/A")}
                                         </td>
                                         <td className="px-6 py-5 whitespace-nowrap">
                                             <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border ${sale.status === 'completed' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :

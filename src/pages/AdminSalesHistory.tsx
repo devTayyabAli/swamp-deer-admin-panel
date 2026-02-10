@@ -192,14 +192,14 @@ const AdminSalesHistory = () => {
                                         <td className="px-6 py-5 whitespace-nowrap">
                                             <div className="flex items-center gap-3">
                                                 <div className="size-9 rounded-xl bg-forest-green text-warm-gold flex items-center justify-center font-black text-[10px] shadow-lg group-hover:rotate-6 transition-all">
-                                                    {(sale.investorId as any)?.fullName?.substring(0, 2).toUpperCase() || 'NI'}
+                                                    {(sale.investorId as any)?.name?.substring(0, 2).toUpperCase() || (sale.investorId as any)?.fullName?.substring(0, 2).toUpperCase() || 'NI'}
                                                 </div>
-                                                <span className="font-bold text-forest-green tracking-tight">{(sale.investorId as any)?.fullName || 'No Investor'}</span>
+                                                <span className="font-bold text-forest-green tracking-tight">{(sale.investorId as any)?.name || (sale.investorId as any)?.fullName || 'No Investor'}</span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-5 text-sm font-bold text-gray-600 whitespace-nowrap">
                                             <span className="bg-neutral-light px-2 py-1 rounded text-[10px] uppercase font-black tracking-widest">
-                                                {typeof sale.branchId === 'object' ? sale.branchId.name : ((branches || []).find(b => b._id === sale.branchId)?.name || "N/A")}
+                                                {sale.branchId ? (typeof sale.branchId === 'object' ? (sale.branchId as any).name : ((branches || []).find(b => b._id === sale.branchId)?.name || "N/A")) : "N/A"}
                                             </span>
                                         </td>
                                         <td className="px-6 py-5 whitespace-nowrap">

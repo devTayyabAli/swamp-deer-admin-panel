@@ -13,11 +13,12 @@ export const createBranch = async (branchData: Omit<Branch, '_id'>): Promise<Bra
     return response.data;
 };
 
-export const getInvestors = async (page = 1, limit = 10, filters: { startDate?: string, endDate?: string } = {}): Promise<PaginatedResponse<Investor>> => {
+export const getInvestors = async (page = 1, limit = 10, filters: { startDate?: string, endDate?: string, search?: string } = {}): Promise<PaginatedResponse<Investor>> => {
     let url = `/investors?page=${page}&limit=${limit}`;
     if (filters.startDate) url += `&startDate=${filters.startDate}`;
     if (filters.endDate) url += `&endDate=${filters.endDate}`;
-    
+    if (filters.search) url += `&search=${filters.search}`;
+
     const response = await api.get<PaginatedResponse<Investor>>(url);
     return response.data;
 };
@@ -35,7 +36,10 @@ export const createInvestor = async (investorData: Omit<Investor, '_id' | 'statu
 export interface InvestorTeam {
     upline: Investor | null;
     current: Partial<Investor>;
-    downline: Partial<Investor>[];
+    direct: Partial<Investor>[];
+    indirect: Partial<Investor>[];
+    all: Partial<Investor>[];
+    downline?: Partial<Investor>[]; // Keeping for compatibility
 }
 
 export const getInvestorTeam = async (id: string): Promise<InvestorTeam> => {
@@ -49,7 +53,7 @@ export const getSales = async (page = 1, limit = 10, filters: { branchId?: strin
     if (filters.startDate) url += `&startDate=${filters.startDate}`;
     if (filters.endDate) url += `&endDate=${filters.endDate}`;
     if (filters.status) url += `&status=${filters.status}`;
-    
+
     const response = await api.get<PaginatedResponse<Sale>>(url);
     return response.data;
 };
@@ -71,11 +75,11 @@ export const updateBranch = async (id: string, branchData: Partial<Branch>): Pro
 
 // Services for Users
 export const getUsers = async (): Promise<User[]> => {
-    const response = await api.get<PaginatedResponse<User>>('/auth/users?limit=-1');
-    return response.data.items || [];
+    const response = await api.get<any>('/auth/users?limit=-1');
+    return response.data?.data?.items || response.data?.items || [];
 };
 
 export const updateUser = async (id: string, userData: Partial<User>): Promise<User> => {
-    const response = await api.put<User>(`/auth/users/${id}`, userData);
-    return response.data;
+    const response = await api.put<any>(`/auth/users/${id}`, userData);
+    return response.data?.data || response.data;
 };
