@@ -33,13 +33,21 @@ export const createInvestor = async (investorData: Omit<Investor, '_id' | 'statu
     return response.data;
 };
 
+export interface TeamMember extends Partial<Investor> {
+    amount: number;
+    profit: number;
+    date: string;
+    upline: string;
+    type: 'direct' | 'indirect';
+}
+
 export interface InvestorTeam {
     upline: Investor | null;
     current: Partial<Investor>;
-    direct: Partial<Investor>[];
-    indirect: Partial<Investor>[];
-    all: Partial<Investor>[];
-    downline?: Partial<Investor>[]; // Keeping for compatibility
+    direct: TeamMember[];
+    indirect: TeamMember[];
+    all: TeamMember[];
+    downline?: TeamMember[]; // Keeping for compatibility
 }
 
 export const getInvestorTeam = async (id: string): Promise<InvestorTeam> => {

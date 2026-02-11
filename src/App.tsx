@@ -13,6 +13,7 @@ import ManageBranches from './pages/ManageBranches';
 import ApproveSales from './pages/ApproveSales';
 import ApproveRewards from './pages/ApproveRewards';
 import ApproveWithdrawals from './pages/ApproveWithdrawals';
+import InvestorTeam from './pages/InvestorTeam';
 
 import { Toaster } from 'react-hot-toast';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -38,6 +39,7 @@ function App() {
           <Route path="/change-password" element={<ChangePassword />} />
           <Route path="/manage-sales" element={<ManageSales />} />
           <Route path="/manage-investors" element={<ManageInvestors />} />
+          <Route path="/manage-investors/:id/team" element={<InvestorTeam />} />
           <Route path="/create-investor" element={<CreateInvestor />} />
           <Route path="/manage-branches" element={<ManageBranches />} />
           <Route path="/approve-sales" element={<ApproveSales />} />

@@ -3,9 +3,8 @@ import clsx from 'clsx';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { fetchInvestors } from '../store/slices/investorSlice';
-import { toggleInvestorStatus, getInvestorTeam, updateUser, type InvestorTeam } from '../services/dataService';
+import { toggleInvestorStatus, updateUser } from '../services/dataService';
 import toast from 'react-hot-toast';
-import TeamViewModal from '../components/TeamViewModal';
 import { useNavigate } from 'react-router-dom';
 import type { Investor } from '../types';
 
@@ -160,9 +159,6 @@ const ManageInvestors = () => {
     const [dateFilter, setDateFilter] = useState('All time');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
-    const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
-    const [selectedTeamData, setSelectedTeamData] = useState<InvestorTeam | null>(null);
-    const [isTeamLoading, setIsTeamLoading] = useState(false);
     const [editingInvestor, setEditingInvestor] = useState<Investor | null>(null);
 
     // Calculate dates based on filter type
@@ -217,18 +213,8 @@ const ManageInvestors = () => {
         }
     };
 
-    const handleViewTeam = async (id: string) => {
-        setIsTeamLoading(true);
-        setIsTeamModalOpen(true);
-        try {
-            const team = await getInvestorTeam(id);
-            setSelectedTeamData(team);
-        } catch (err) {
-            toast.error('Failed to load team data');
-            setIsTeamModalOpen(false);
-        } finally {
-            setIsTeamLoading(false);
-        }
+    const handleViewTeam = (id: string) => {
+        navigate(`/manage-investors/${id}/team`);
     };
 
     const handleUpdateInvestor = async (updatedData: Partial<Investor>) => {
@@ -522,13 +508,6 @@ const ManageInvestors = () => {
                     </div>
                 </div>
             </section>
-
-            <TeamViewModal
-                isOpen={isTeamModalOpen}
-                onClose={() => setIsTeamModalOpen(false)}
-                teamData={selectedTeamData}
-                isLoading={isTeamLoading}
-            />
 
             {editingInvestor && (
                 <EditInvestorModal
