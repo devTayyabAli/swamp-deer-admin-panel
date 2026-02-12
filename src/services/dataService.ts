@@ -1,5 +1,5 @@
 import api from '../lib/axios';
-import type { Branch, Investor, Sale, CreateSaleDTO, User, PaginatedResponse } from '../types';
+import type { Branch, Investor, Sale, CreateSaleDTO, User, PaginatedResponse, InvestmentPlan } from '../types';
 
 export const getBranches = async (limit?: number): Promise<Branch[]> => {
     let url = '/branches';
@@ -90,4 +90,23 @@ export const getUsers = async (): Promise<User[]> => {
 export const updateUser = async (id: string, userData: Partial<User>): Promise<User> => {
     const response = await api.put<any>(`/auth/users/${id}`, userData);
     return response.data?.data || response.data;
+};
+
+// Services for Investment Plans
+export const getPlans = async (scope?: string, scopeId?: string): Promise<InvestmentPlan[]> => {
+    let url = '/plans';
+    if (scope) url += `?scope=${scope}`;
+    if (scopeId) url += `&scopeId=${scopeId}`;
+    const response = await api.get<any>(url);
+    return response.data?.data || response.data || [];
+};
+
+export const upsertPlan = async (planData: InvestmentPlan): Promise<InvestmentPlan> => {
+    const response = await api.post<any>('/plans', planData);
+    return response.data?.data || response.data;
+};
+
+export const deletePlan = async (id: string): Promise<any> => {
+    const response = await api.delete<any>(`/plans/${id}`);
+    return response.data;
 };

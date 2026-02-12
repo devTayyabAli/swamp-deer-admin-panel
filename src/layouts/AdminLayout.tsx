@@ -157,6 +157,10 @@ const AdminLayout = () => {
                                 <span className="material-symbols-outlined text-sm">payments</span>
                                 <span>Withdrawals</span>
                             </NavLink>
+                            <NavLink to="/manage-plans" className={({ isActive }) => navLinkClasses({ isActive }, true)}>
+                                <span className="material-symbols-outlined text-sm">settings_suggest</span>
+                                <span>Investment Plans</span>
+                            </NavLink>
                         </SidebarGroup>
 
                         {/* Creation Hub */}

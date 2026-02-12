@@ -109,3 +109,29 @@ export interface PaginatedResponse<T> {
         totalProfit: number;
     };
 }
+
+export interface PhaseConfig {
+    phase: number;
+    months: number;
+    rate: number;
+    description: string;
+}
+
+export interface RankTarget {
+    rankId: number;
+    title: string;
+    withoutProduct: number;
+    withProduct: number;
+}
+
+export interface InvestmentPlan {
+    _id?: string;
+    scope: 'global' | 'branch' | 'user';
+    scopeId?: string;
+    referralBonusRates: number[];
+    matchingBonusRates: number[];
+    withProductPhases: PhaseConfig[];
+    withoutProductPhases: PhaseConfig[];
+    rankTargets: RankTarget[];
+    profitCapMultiplier: number;
+}
