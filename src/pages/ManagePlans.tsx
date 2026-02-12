@@ -41,6 +41,8 @@ const ManagePlans = () => {
         profitCapMultiplier: 5
     });
 
+
+
     useEffect(() => {
         const loadInitialData = async () => {
             try {
@@ -222,7 +224,7 @@ const ManagePlans = () => {
                                             <input
                                                 type="number" step="0.5"
                                                 className="w-full rounded-lg border-border-light text-sm p-2 font-bold"
-                                                value={phase.rate * 100}
+                                                value={parseFloat((phase.rate * 100).toFixed(4))}
                                                 onChange={(e) => updatePhase('with', idx, 'rate', parseFloat(e.target.value) / 100)}
                                             />
                                         </div>
@@ -260,7 +262,7 @@ const ManagePlans = () => {
                                             <input
                                                 type="number" step="0.5"
                                                 className="w-full rounded-lg border-border-light text-sm p-2 font-bold"
-                                                value={phase.rate * 100}
+                                                value={parseFloat((phase.rate * 100).toFixed(4))}
                                                 onChange={(e) => updatePhase('without', idx, 'rate', parseFloat(e.target.value) / 100)}
                                             />
                                         </div>
