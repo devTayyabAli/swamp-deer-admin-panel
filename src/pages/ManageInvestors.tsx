@@ -7,7 +7,7 @@ import { toggleInvestorStatus, updateUser, getInvestorRewards, getSales } from '
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import type { Investor, Sale } from '../types';
-import { Search, Filter, Calendar, Trophy, Coins, History, ArrowUpRight, TrendingUp, Users2, Wallet, Edit3, UserCheck, UserMinus, MoreHorizontal } from 'lucide-react';
+import { Calendar, Coins, History, TrendingUp, Users2, Wallet, Edit3, UserCheck, UserMinus, MoreHorizontal } from 'lucide-react';
 
 interface EditInvestorModalProps {
     investor: Investor;
