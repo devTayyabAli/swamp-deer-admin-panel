@@ -13,6 +13,7 @@ import ManageBranches from './pages/ManageBranches';
 import ApproveSales from './pages/ApproveSales';
 import ApproveRewards from './pages/ApproveRewards';
 import ApproveWithdrawals from './pages/ApproveWithdrawals';
+import WithdrawalHistory from './pages/WithdrawalHistory';
 import InvestorTeam from './pages/InvestorTeam';
 import ManagePlans from './pages/ManagePlans';
 
@@ -46,6 +47,7 @@ function App() {
           <Route path="/approve-sales" element={<ApproveSales />} />
           <Route path="/approve-rewards" element={<ApproveRewards />} />
           <Route path="/approve-withdrawals" element={<ApproveWithdrawals />} />
+          <Route path="/withdrawal-history" element={<WithdrawalHistory />} />
           <Route path="/manage-plans" element={<ManagePlans />} />
         </Route>
 

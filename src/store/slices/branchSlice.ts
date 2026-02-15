@@ -16,9 +16,9 @@ const initialState: BranchState = {
 
 export const fetchBranches = createAsyncThunk(
     'branches/fetchAll',
-    async (params: { limit?: number } = {}, { rejectWithValue }) => {
+    async (params: { limit?: number, startDate?: string, endDate?: string } = {}, { rejectWithValue }) => {
         try {
-            return await getBranches(params.limit);
+            return await getBranches(params.limit, { startDate: params.startDate, endDate: params.endDate });
         } catch (error: unknown) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             return rejectWithValue((error as any).response?.data?.message || 'Failed to fetch branches');

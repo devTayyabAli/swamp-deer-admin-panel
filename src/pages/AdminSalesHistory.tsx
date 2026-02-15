@@ -109,6 +109,7 @@ const AdminSalesHistory = () => {
                             <option value="All">All Statuses</option>
                             <option value="Pending">Pending</option>
                             <option value="Completed">Completed</option>
+                            <option value="Active">Active</option>
                         </select>
                     </div>
 
@@ -218,7 +219,7 @@ const AdminSalesHistory = () => {
                                         <td className="px-6 py-5 text-sm font-black text-forest-green">Rs {sale.amount.toLocaleString()}</td>
                                         <td className="px-6 py-5 text-sm font-black text-swamp-deer text-right">
                                             <span className="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-[11px]">
-                                                +Rs {(sale.amount - sale.commission).toLocaleString()}
+                                                +Rs {(sale.totalProfitEarned || 0).toLocaleString()}
                                             </span>
                                         </td>
                                     </tr>

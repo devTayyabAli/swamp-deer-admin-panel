@@ -1,10 +1,13 @@
 import api from '../lib/axios';
 import type { Branch, Investor, Sale, CreateSaleDTO, User, PaginatedResponse, InvestmentPlan } from '../types';
 
-export const getBranches = async (limit?: number): Promise<Branch[]> => {
-    let url = '/branches';
-    if (limit !== undefined) url += `?limit=${limit}`;
-    const response = await api.get<Branch[]>(url);
+export const getBranches = async (limit?: number, filters?: { startDate?: string, endDate?: string }): Promise<Branch[]> => {
+    const params = new URLSearchParams();
+    if (limit !== undefined) params.append('limit', limit.toString());
+    if (filters?.startDate) params.append('startDate', filters.startDate);
+    if (filters?.endDate) params.append('endDate', filters.endDate);
+
+    const response = await api.get<Branch[]>(`/branches?${params.toString()}`);
     return response.data;
 };
 
@@ -55,12 +58,22 @@ export const getInvestorTeam = async (id: string): Promise<InvestorTeam> => {
     return response.data;
 };
 
-export const getSales = async (page = 1, limit = 10, filters: { branchId?: string, startDate?: string, endDate?: string, status?: string } = {}): Promise<PaginatedResponse<Sale>> => {
+export const getInvestorRewards = async (id: string, page = 1, limit = 10, filters: { type?: string, startDate?: string, endDate?: string } = {}): Promise<PaginatedResponse<any>> => {
+    let url = `/rewards/investor/${id}?page=${page}&limit=${limit}`;
+    if (filters.type) url += `&type=${filters.type}`;
+    if (filters.startDate) url += `&startDate=${filters.startDate}`;
+    if (filters.endDate) url += `&endDate=${filters.endDate}`;
+
+    const response = await api.get<any>(url);
+    return response.data?.data || response.data;
+};
+export const getSales = async (page = 1, limit = 10, filters: { branchId?: string, startDate?: string, endDate?: string, status?: string, investorId?: string } = {}): Promise<PaginatedResponse<Sale>> => {
     let url = `/sales?page=${page}&limit=${limit}`;
     if (filters.branchId) url += `&branchId=${filters.branchId}`;
     if (filters.startDate) url += `&startDate=${filters.startDate}`;
     if (filters.endDate) url += `&endDate=${filters.endDate}`;
     if (filters.status) url += `&status=${filters.status}`;
+    if (filters.investorId) url += `&investorId=${filters.investorId}`;
 
     const response = await api.get<PaginatedResponse<Sale>>(url);
     return response.data;

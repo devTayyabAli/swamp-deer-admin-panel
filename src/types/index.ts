@@ -57,9 +57,22 @@ export interface Sale {
     commission: number;
     date: string;
     createdAt: string;
-    status: 'pending' | 'completed' | 'rejected';
+    status: 'pending' | 'completed' | 'rejected' | 'active' | 'cancelled';
     paymentMethod?: 'Cash in hand' | 'Bank account';
+    receiptPath?: string;
+    documentPath?: string;
     investorProfit?: number;
+    productStatus?: 'with_product' | 'without_product';
+    // Investment tracking fields
+    duration?: number;
+    rewardPercentage?: number;
+    endDate?: string;
+    lastRewardAt?: string;
+    currentPhase?: number;
+    phaseStartDate?: string;
+    monthsCompleted?: number;
+    totalProfitEarned?: number;
+    profitCap?: number;
 }
 
 export interface AuthResponse {
@@ -102,6 +115,7 @@ export interface PaginatedResponse<T> {
     page: number;
     pages: number;
     total: number;
+    filteredTotal?: number;
     totalAmountInvested?: number;
     totalRewardPaid?: number;
     summary?: {

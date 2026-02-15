@@ -137,10 +137,10 @@ const AdminLayout = () => {
                                 <span className="material-symbols-outlined text-sm">domain</span>
                                 <span>Branches</span>
                             </NavLink>
-                            <NavLink to="/manage-sales" className={({ isActive }) => navLinkClasses({ isActive }, true)}>
+                            {/* <NavLink to="/manage-sales" className={({ isActive }) => navLinkClasses({ isActive }, true)}>
                                 <span className="material-symbols-outlined text-sm">badge</span>
                                 <span>Sales Users</span>
-                            </NavLink>
+                            </NavLink> */}
                             <NavLink to="/manage-investors" className={({ isActive }) => navLinkClasses({ isActive }, true)}>
                                 <span className="material-symbols-outlined text-sm">group</span>
                                 <span>Investors</span>
@@ -164,7 +164,7 @@ const AdminLayout = () => {
                         </SidebarGroup>
 
                         {/* Creation Hub */}
-                        <SidebarGroup
+                        {/* <SidebarGroup
                             label="Creation Hub"
                             icon="add_circle"
                             isOpen={openGroups.creation}
@@ -179,18 +179,28 @@ const AdminLayout = () => {
                                 <span className="material-symbols-outlined text-sm">person_add</span>
                                 <span>New Sales User</span>
                             </NavLink>
-                        </SidebarGroup>
+                        </SidebarGroup> */}
 
                         <div className="my-2 border-t border-white/5"></div>
 
                         {/* Reports & History */}
-                        <NavLink to="/history" className={({ isActive }) => navLinkClasses({ isActive })}>
+                        {/* <NavLink to="/history" className={({ isActive }) => navLinkClasses({ isActive })}>
                             <span className="material-symbols-outlined shrink-0">history</span>
                             <span className={clsx(
                                 "font-medium whitespace-nowrap transition-opacity duration-300",
                                 !isSidebarPinned && "lg:opacity-0 lg:group-hover:opacity-100"
                             )}>
                                 Sales History
+                            </span>
+                        </NavLink> */}
+
+                        <NavLink to="/withdrawal-history" className={({ isActive }) => navLinkClasses({ isActive })}>
+                            <span className="material-symbols-outlined shrink-0">history_edu</span>
+                            <span className={clsx(
+                                "font-medium whitespace-nowrap transition-opacity duration-300",
+                                !isSidebarPinned && "lg:opacity-0 lg:group-hover:opacity-100"
+                            )}>
+                                Withdrawal History
                             </span>
                         </NavLink>
 

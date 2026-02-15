@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import clsx from 'clsx';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { fetchInvestors } from '../store/slices/investorSlice';
-import { toggleInvestorStatus, updateUser } from '../services/dataService';
+import { toggleInvestorStatus, updateUser, getInvestorRewards, getSales } from '../services/dataService';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import type { Investor } from '../types';
+import type { Investor, Sale } from '../types';
+import { Search, Filter, Calendar, Trophy, Coins, History, ArrowUpRight, TrendingUp, Users2, Wallet, Edit3, UserCheck, UserMinus, MoreHorizontal } from 'lucide-react';
 
 interface EditInvestorModalProps {
     investor: Investor;
@@ -144,11 +145,484 @@ const EditInvestorModal = ({ investor, onClose, onSave }: EditInvestorModalProps
                     </div>
                 </form>
             </div >
-        </div >
+        </div>
+    );
+};
+
+const ReceiptViewModal = ({ path, onClose }: { path: string; onClose: () => void }) => {
+    return (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95 backdrop-blur-xl p-8 animate-in fade-in duration-300">
+            <button
+                onClick={onClose}
+                className="absolute top-8 right-8 p-3 bg-white/10 hover:bg-white/20 rounded-full text-white transition-all group active:scale-95 z-[210]"
+            >
+                <span className="material-symbols-outlined group-hover:rotate-90 transition-all">close</span>
+            </button>
+            <div className="relative max-w-full max-h-full flex items-center justify-center animate-in zoom-in-95 duration-300">
+                <img
+                    src={`${(import.meta.env.VITE_API_URL || '').replace('/api', '')}/${path}`}
+                    alt="Investment Receipt"
+                    className="max-w-full max-h-[85vh] rounded-2xl shadow-2xl object-contain border border-white/10"
+                />
+                <div className="absolute -bottom-12 left-0 right-0 text-center">
+                    <p className="text-white/60 text-[10px] font-black uppercase tracking-widest italic">Encrypted Secure Asset Verification</p>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+interface InvestmentHistoryModalProps {
+    investor: Investor;
+    onClose: () => void;
+}
+
+const InvestmentHistoryModal = ({ investor, onClose }: InvestmentHistoryModalProps) => {
+    const [investments, setInvestments] = useState<Sale[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [viewingReceipt, setViewingReceipt] = useState<string | null>(null);
+
+    const fetchInvestments = async () => {
+        try {
+            setLoading(true);
+            const res = await getSales(1, 100, {
+                investorId: investor._id
+            });
+            if (res.items) {
+                setInvestments(res.items);
+            }
+        } catch (error) {
+            toast.error('Failed to fetch investment history');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchInvestments();
+    }, []);
+
+    return (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-in fade-in duration-300">
+            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col animate-in zoom-in-95 duration-300">
+                <div className="p-6 border-b border-border-light flex justify-between items-center bg-neutral-light/30">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-forest-green/10 rounded-2xl">
+                            <Coins className="w-6 h-6 text-forest-green" />
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight italic">Investment Asset Ledger</h3>
+                            <p className="text-xs font-bold text-gray-400 mt-0.5 uppercase tracking-widest leading-none opacity-80">
+                                Portfolio: <span className="text-forest-green">{investor.fullName}</span> • Capital Deployment Tracking
+                            </p>
+                        </div>
+                    </div>
+                    <button onClick={onClose} className="p-2.5 hover:bg-gray-100 rounded-full transition-all group active:scale-95">
+                        <span className="material-symbols-outlined text-gray-400 group-hover:text-gray-900 group-hover:rotate-90 transition-all">close</span>
+                    </button>
+                </div>
+
+                <div className="p-6 flex-1 overflow-auto bg-white">
+                    <div className="border border-border-light rounded-2xl overflow-hidden shadow-sm">
+                        <table className="w-full text-left">
+                            <thead className="bg-neutral-light/50 border-b border-border-light">
+                                <tr>
+                                    <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Date</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Method</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Status</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Amount</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-border-light/50">
+                                {loading ? (
+                                    <tr>
+                                        <td colSpan={5} className="px-6 py-20 text-center">
+                                            <div className="flex flex-col items-center gap-3">
+                                                <div className="w-8 h-8 border-3 border-forest-green/20 border-t-forest-green rounded-full animate-spin"></div>
+                                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Accessing Vault...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : investments.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={5} className="px-6 py-20 text-center">
+                                            <div className="flex flex-col items-center gap-2 opacity-30">
+                                                <History className="w-12 h-12 text-gray-400" />
+                                                <p className="text-xs font-black uppercase tracking-widest">No deployed capital found</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : investments.map((sale) => (
+                                    <tr key={sale._id} className="hover:bg-neutral-light/30 transition-colors">
+                                        <td className="px-6 py-4">
+                                            <div className="text-xs font-bold text-gray-900 tracking-tight">
+                                                {new Date(sale.date || sale.createdAt).toLocaleDateString(undefined, { month: 'short', day: '2-digit', year: 'numeric' })}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest px-2 py-1 bg-gray-50 rounded-md border border-gray-100">
+                                                {sale.paymentMethod}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className={clsx(
+                                                "px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border",
+                                                sale.status === 'completed' ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
+                                                    sale.status === 'rejected' ? "bg-red-50 text-red-600 border-red-100" :
+                                                        "bg-amber-50 text-amber-600 border-amber-100"
+                                            )}>
+                                                {sale.status}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            <span className="text-xs font-black text-forest-green">
+                                                Rs {sale.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                            {sale.paymentMethod === 'Bank account' && sale.receiptPath ? (
+                                                <button
+                                                    onClick={() => setViewingReceipt(sale.receiptPath!)}
+                                                    className="inline-flex items-center gap-1.5 text-indigo-600 hover:text-indigo-800 transition-colors"
+                                                >
+                                                    <span className="material-symbols-outlined text-[18px]">image</span>
+                                                    <span className="text-[9px] font-black uppercase tracking-widest underline decoration-2 underline-offset-4">View Receipt</span>
+                                                </button>
+                                            ) : (
+                                                <span className="text-[9px] font-black text-gray-300 uppercase tracking-widest">No Media</span>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div className="p-4 bg-neutral-light/30 border-t border-border-light flex justify-center">
+                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] italic">Secured by Swamp Deer Blockchain Ledger Technology</p>
+                </div>
+            </div>
+
+            {viewingReceipt && (
+                <ReceiptViewModal path={viewingReceipt} onClose={() => setViewingReceipt(null)} />
+            )}
+        </div>
+    );
+};
+
+interface RewardDetailsModalProps {
+    investor: Investor;
+    onClose: () => void;
+}
+
+const RewardDetailsModal = ({ investor, onClose }: RewardDetailsModalProps) => {
+    const [rewards, setRewards] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
+    const [currentPage, setCurrentPage] = useState(1);
+    const [rewardType, setRewardType] = useState('all');
+    const [filteredTotal, setFilteredTotal] = useState<number | null>(null);
+
+    const fetchRewards = async () => {
+        try {
+            setLoading(true);
+            const res = await getInvestorRewards(investor._id, currentPage, 10, {
+                type: rewardType === 'all' ? undefined : rewardType
+            });
+            if (res.items) {
+                setRewards(res.items);
+                setPagination({
+                    page: res.page,
+                    pages: res.pages,
+                    total: res.total
+                });
+                setFilteredTotal(res.filteredTotal ?? null);
+            }
+        } catch (error) {
+            toast.error('Failed to fetch rewards');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchRewards();
+    }, [currentPage, rewardType]);
+
+    return (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 backdrop-blur-md p-4 animate-in fade-in duration-300">
+            <div className="bg-white rounded-3xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col animate-in zoom-in-95 duration-300">
+                <div className="p-6 border-b border-border-light flex justify-between items-center bg-neutral-light/30">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-swamp-deer/10 rounded-2xl">
+                            <History className="w-6 h-6 text-swamp-deer" />
+                        </div>
+                        <div>
+                            <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight italic">Reward Harvest Detailed Ledger</h3>
+                            <p className="text-xs font-bold text-gray-400 mt-0.5 uppercase tracking-widest leading-none opacity-80">
+                                Portfolio: <span className="text-swamp-deer">{investor.fullName}</span> • Strategic Asset Tracking
+                            </p>
+                        </div>
+                    </div>
+                    <button onClick={onClose} className="p-2.5 hover:bg-gray-100 rounded-full transition-all group active:scale-95">
+                        <span className="material-symbols-outlined text-gray-400 group-hover:text-gray-900 group-hover:rotate-90 transition-all">close</span>
+                    </button>
+                </div>
+
+                <div className="p-6 flex-1 overflow-auto bg-white">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                        <div className="flex items-center gap-2 bg-neutral-light/50 p-1.5 rounded-2xl w-fit">
+                            {['all', 'staking', 'direct_income', 'level_income'].map((t) => (
+                                <button
+                                    key={t}
+                                    onClick={() => { setRewardType(t); setCurrentPage(1); }}
+                                    className={clsx(
+                                        "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                                        rewardType === t
+                                            ? "bg-white text-swamp-deer shadow-sm ring-1 ring-border-light"
+                                            : "text-gray-400 hover:text-gray-600"
+                                    )}
+                                >
+                                    {t.replace('_', ' ')}
+                                </button>
+                            ))}
+                        </div>
+                        <div className="text-right">
+                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest opacity-60">
+                                {rewardType === 'all' ? 'Total Ledger Yield: ' : 'Filtered Total: '}
+                            </span>
+                            <span className="text-lg font-black text-forest-green italic ml-1">
+                                Rs {(filteredTotal ?? (rewardType === 'all' ? (investor.totalReward || 0) : 0)).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                            </span>
+                        </div>
+                    </div>
+                    <div className="border border-border-light rounded-2xl overflow-hidden shadow-sm">
+                        <table className="w-full text-left">
+                            <thead className="bg-neutral-light/50 border-b border-border-light">
+                                <tr>
+                                    <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Execution Date</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Reward Type</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest">Asset Origin</th>
+                                    <th className="px-6 py-4 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Yield Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-border-light/50">
+                                {loading ? (
+                                    <tr>
+                                        <td colSpan={4} className="px-6 py-20 text-center">
+                                            <div className="flex flex-col items-center gap-3">
+                                                <div className="w-8 h-8 border-3 border-swamp-deer/20 border-t-swamp-deer rounded-full animate-spin"></div>
+                                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Syncing Ledger...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : rewards.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={4} className="px-6 py-20 text-center">
+                                            <div className="flex flex-col items-center gap-2 text-gray-300">
+                                                <Coins className="w-10 h-10 opacity-20" />
+                                                <span className="text-[10px] font-black uppercase tracking-widest">No yield records found</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    rewards.map((reward) => (
+                                        <tr key={reward._id} className="hover:bg-neutral-light/30 transition-colors">
+                                            <td className="px-6 py-4">
+                                                <div className="flex items-center gap-2 text-xs font-bold text-gray-600">
+                                                    <Calendar className="w-3.5 h-3.5 opacity-50" />
+                                                    {new Date(reward.createdAt).toLocaleDateString(undefined, {
+                                                        day: 'numeric', month: 'short', year: 'numeric'
+                                                    })}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className={clsx(
+                                                    "inline-flex items-center px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border",
+                                                    reward.type === 'staking' ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
+                                                        reward.type === 'direct_income' ? "bg-indigo-50 text-indigo-600 border-indigo-100" :
+                                                            "bg-warm-gold/10 text-warm-gold border-warm-gold/20"
+                                                )}>
+                                                    <TrendingUp className="w-3 h-3 mr-1" />
+                                                    {reward.type.replace('_', ' ')}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <div className="max-w-[200px]">
+                                                    <p className="text-xs font-bold text-gray-900 truncate">
+                                                        {reward.stakeId?.user?.name || 'Vested Stake'}
+                                                    </p>
+                                                    <p className="text-[9px] font-black text-gray-400 uppercase tracking-tighter opacity-60">
+                                                        Principal: Rs {reward.stakeId?.amount?.toLocaleString()}
+                                                    </p>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-right">
+                                                <div className="flex flex-col items-end">
+                                                    <span className="text-sm font-black text-forest-green italic tracking-tight">
+                                                        +Rs {reward.amount?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                    </span>
+                                                    <span className="text-[8px] font-black text-emerald-500 uppercase tracking-widest leading-none mt-0.5">Verified Asset</span>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div className="bg-neutral-light/30 px-6 py-4 border-t border-border-light flex items-center justify-between">
+                    <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest opacity-60">
+                        Entry {(pagination.page - 1) * 10 + 1} to {Math.min(pagination.page * 10, pagination.total)} of {pagination.total} records
+                    </span>
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                            disabled={currentPage === 1 || loading}
+                            className="p-1 px-3 rounded-lg border border-border-light hover:bg-white text-gray-400 hover:text-swamp-deer transition-all disabled:opacity-30"
+                        >
+                            <span className="material-symbols-outlined align-middle">chevron_left</span>
+                        </button>
+                        <button
+                            onClick={() => setCurrentPage(p => Math.min(pagination.pages, p + 1))}
+                            disabled={currentPage === pagination.pages || loading}
+                            className="p-1 px-3 rounded-lg border border-border-light hover:bg-white text-gray-400 hover:text-swamp-deer transition-all disabled:opacity-30"
+                        >
+                            <span className="material-symbols-outlined align-middle">chevron_right</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const ActionDropdown = ({
+    investor,
+    onViewTeam,
+    onViewRewards,
+    onViewInvestments,
+    onEdit,
+    onToggleStatus
+}: {
+    investor: Investor;
+    onViewTeam: (id: string) => void;
+    onViewRewards: (investor: Investor) => void;
+    onViewInvestments: (investor: Investor) => void;
+    onEdit: (investor: Investor) => void;
+    onToggleStatus: (id: string) => void;
+}) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    return (
+        <div className="relative" ref={dropdownRef}>
+            <button
+                onClick={() => setIsOpen(!isOpen)}
+                className={clsx(
+                    "w-9 h-9 flex items-center justify-center rounded-xl transition-all duration-300 border shadow-sm",
+                    isOpen ? "bg-forest-green text-white border-forest-green shadow-forest-green/20" : "bg-white text-gray-400 border-border-light hover:border-forest-green/30 hover:text-forest-green"
+                )}
+            >
+                <MoreHorizontal className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+            </button>
+
+            {isOpen && (
+                <div className="absolute right-0 mt-3 w-56 bg-white/95 backdrop-blur-xl border border-border-light rounded-[24px] shadow-2xl z-[100] py-2.5 animate-in fade-in zoom-in-95 duration-200 origin-top-right ring-1 ring-black/[0.05]">
+                    <div className="px-5 py-2 border-b border-border-light/50 mb-2">
+                        <p className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] leading-none">Investor Actions</p>
+                    </div>
+
+                    <div className="px-2 space-y-0.5">
+                        <button
+                            onClick={() => { onViewTeam(investor._id); setIsOpen(false); }}
+                            className="w-full flex items-center gap-3 px-3 py-2 rounded-2xl text-left hover:bg-forest-green/5 group transition-all"
+                        >
+                            <div className="w-8 h-8 rounded-xl bg-forest-green/10 flex items-center justify-center text-forest-green group-hover:bg-forest-green group-hover:text-white transition-all shadow-sm">
+                                <Users2 className="w-4 h-4" />
+                            </div>
+                            <span className="text-xs font-bold text-gray-600 group-hover:text-forest-green transition-colors tracking-tight">View Team Network</span>
+                        </button>
+
+                        <button
+                            onClick={() => { onViewRewards(investor); setIsOpen(false); }}
+                            className="w-full flex items-center gap-3 px-3 py-2 rounded-2xl text-left hover:bg-swamp-deer/5 group transition-all"
+                        >
+                            <div className="w-8 h-8 rounded-xl bg-swamp-deer/10 flex items-center justify-center text-swamp-deer group-hover:bg-swamp-deer group-hover:text-white transition-all shadow-sm">
+                                <Wallet className="w-4 h-4" />
+                            </div>
+                            <span className="text-xs font-bold text-gray-700 group-hover:text-swamp-deer transition-colors tracking-tight">View Reward Ledger</span>
+                        </button>
+
+                        <button
+                            onClick={() => { onViewInvestments(investor); setIsOpen(false); }}
+                            className="w-full flex items-center gap-3 px-3 py-2 rounded-2xl text-left hover:bg-amber-600/5 group transition-all"
+                        >
+                            <div className="w-8 h-8 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600 group-hover:bg-amber-600 group-hover:text-white transition-all shadow-sm">
+                                <Coins className="w-4 h-4" />
+                            </div>
+                            <span className="text-xs font-bold text-gray-600 group-hover:text-amber-600 transition-colors tracking-tight">View Investments</span>
+                        </button>
+
+                        <button
+                            onClick={() => { onEdit(investor); setIsOpen(false); }}
+                            className="w-full flex items-center gap-3 px-3 py-2 rounded-2xl text-left hover:bg-indigo-600/5 group transition-all"
+                        >
+                            <div className="w-8 h-8 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">
+                                <Edit3 className="w-4 h-4" />
+                            </div>
+                            <span className="text-xs font-bold text-gray-700 group-hover:text-indigo-600 transition-colors tracking-tight">Edit Investor Details</span>
+                        </button>
+                    </div>
+
+                    <div className="my-2 mx-5 border-t border-border-light/50"></div>
+
+                    <div className="px-2">
+                        <button
+                            onClick={() => { onToggleStatus(investor._id); setIsOpen(false); }}
+                            className={clsx(
+                                "w-full flex items-center gap-3 px-3 py-2 rounded-2xl text-left group transition-all",
+                                investor.status === 'banned' ? "hover:bg-emerald-600/5" : "hover:bg-red-600/5"
+                            )}
+                        >
+                            <div className={clsx(
+                                "w-8 h-8 rounded-xl flex items-center justify-center transition-all shadow-sm",
+                                investor.status === 'banned'
+                                    ? "bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white"
+                                    : "bg-red-50 text-red-500 group-hover:bg-red-500 group-hover:text-white"
+                            )}>
+                                {investor.status === 'banned' ? <UserCheck className="w-4 h-4" /> : <UserMinus className="w-4 h-4" />}
+                            </div>
+                            <span className={clsx(
+                                "text-xs font-bold transition-colors tracking-tight",
+                                investor.status === 'banned' ? "text-emerald-700 group-hover:text-emerald-800" : "text-red-600 group-hover:text-red-700"
+                            )}>
+                                {investor.status === 'banned' ? 'Unban Investor' : 'Ban Investor'}
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 };
 
 const ManageInvestors = () => {
+
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
     const { items: investors, isLoading: isInvestorsLoading, pagination } = useSelector((state: RootState) => state.investors);
@@ -160,6 +634,8 @@ const ManageInvestors = () => {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [editingInvestor, setEditingInvestor] = useState<Investor | null>(null);
+    const [viewingRewardsInvestor, setViewingRewardsInvestor] = useState<Investor | null>(null);
+    const [viewingInvestmentsInvestor, setViewingInvestmentsInvestor] = useState<Investor | null>(null);
 
     // Calculate dates based on filter type
     useEffect(() => {
@@ -298,13 +774,13 @@ const ManageInvestors = () => {
                         </div>
                     </div>
                 </div>
-                <button
+                {/* <button
                     onClick={() => navigate('/create-investor')}
                     className="bg-deep-green text-white px-5 py-2.5 rounded-lg font-bold text-sm flex items-center gap-2 hover:bg-forest-green transition-all shadow-md h-fit self-start"
                 >
                     <span className="material-symbols-outlined text-sm">person_add</span>
                     Add New Investor
-                </button>
+                </button> */}
             </div>
 
             {/* Content Section */}
@@ -383,7 +859,7 @@ const ManageInvestors = () => {
                                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.15em]">Amount Invested</th>
                                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.15em]">Date of Joining</th>
                                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.15em]">Product Status</th>
-                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.15em]">Rates (P/C)</th>
+                                    {/* <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.15em]">Rates (P/C)</th> */}
                                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.15em] text-right">Total Reward</th>
                                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.15em] text-right">Actions</th>
                                 </tr>
@@ -397,63 +873,48 @@ const ManageInvestors = () => {
                                         </td>
                                         <td className="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">{investor.phone}</td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className="text-sm font-bold text-warm-gold bg-warm-gold/10 px-2 py-1 rounded">
-                                                Rs {(investor.amountInvested || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                            </span>
+                                            <div className="flex flex-col">
+                                                <span className="text-sm font-black text-gray-900 tracking-tight">
+                                                    Rs {(investor.amountInvested || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                </span>
+                                                <span className="text-[9px] font-black text-warm-gold uppercase tracking-widest opacity-70">Capital Investment</span>
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4 text-sm text-gray-600">
-                                            {investor.createdAt ? new Date(investor.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) : '—'}
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-border-light"></div>
+                                                {investor.createdAt ? new Date(investor.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) : '—'}
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4">
                                             {investor.productStatus === 'with_product' ? (
-                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                                    With Product
+                                                <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-100">
+                                                    Vested Strategy
                                                 </span>
                                             ) : (
-                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-gray-100 text-gray-600 border border-gray-200">
-                                                    Without Product
+                                                <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest bg-gray-50 text-gray-400 border border-gray-100">
+                                                    Standard Yield
                                                 </span>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="flex flex-col">
-                                                <span className="text-[11px] font-black text-emerald-600">P: {((investor.profitRate || 0.05) * 100).toFixed(0)}%</span>
-                                                <span className="text-[11px] font-black text-indigo-600">C: {((investor.commissionRate || 0.05) * 100).toFixed(0)}%</span>
+                                        <td className="px-6 py-4 text-right">
+                                            <div className="flex flex-col items-end">
+                                                <span className="text-sm font-black text-forest-green italic tracking-tight">
+                                                    Rs {(investor.totalReward || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                </span>
+                                                <span className="text-[8px] font-black text-emerald-500/60 uppercase tracking-widest leading-none mt-0.5">Total Harvested</span>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 text-sm font-bold text-swamp-deer text-right">
-                                            Rs {(investor.totalReward || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                                        </td>
                                         <td className="px-6 py-4 text-right">
-                                            <div className="flex items-center justify-end gap-2  transition-opacity">
-                                                <button
-                                                    onClick={() => handleViewTeam(investor._id)}
-                                                    className="p-2 text-forest-green hover:bg-forest-green/5 rounded-lg transition-colors border border-transparent hover:border-forest-green/10"
-                                                    title="View Team"
-                                                >
-                                                    <span className="material-symbols-outlined text-[20px]">hub</span>
-                                                </button>
-                                                <button
-                                                    onClick={() => setEditingInvestor(investor)}
-                                                    className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors border border-transparent hover:border-indigo-100"
-                                                    title="Edit Investor"
-                                                >
-                                                    <span className="material-symbols-outlined text-[20px]">edit</span>
-                                                </button>
-                                                <button
-                                                    onClick={() => handleToggleStatus(investor._id)}
-                                                    className={clsx(
-                                                        "p-2 rounded-lg transition-colors border border-transparent",
-                                                        investor.status === 'banned'
-                                                            ? "text-emerald-600 hover:bg-emerald-50 hover:border-emerald-100"
-                                                            : "text-red-600 hover:bg-red-50 hover:border-red-100"
-                                                    )}
-                                                    title={investor.status === 'banned' ? 'Unban' : 'Ban'}
-                                                >
-                                                    <span className="material-symbols-outlined text-[20px]">
-                                                        {investor.status === 'banned' ? 'check_circle' : 'block'}
-                                                    </span>
-                                                </button>
+                                            <div className="flex justify-end pr-2">
+                                                <ActionDropdown
+                                                    investor={investor}
+                                                    onViewTeam={handleViewTeam}
+                                                    onViewRewards={setViewingRewardsInvestor}
+                                                    onViewInvestments={setViewingInvestmentsInvestor}
+                                                    onEdit={setEditingInvestor}
+                                                    onToggleStatus={handleToggleStatus}
+                                                />
                                             </div>
                                         </td>
                                     </tr>
@@ -514,6 +975,20 @@ const ManageInvestors = () => {
                     investor={editingInvestor}
                     onClose={() => setEditingInvestor(null)}
                     onSave={handleUpdateInvestor}
+                />
+            )}
+
+            {viewingRewardsInvestor && (
+                <RewardDetailsModal
+                    investor={viewingRewardsInvestor}
+                    onClose={() => setViewingRewardsInvestor(null)}
+                />
+            )}
+
+            {viewingInvestmentsInvestor && (
+                <InvestmentHistoryModal
+                    investor={viewingInvestmentsInvestor}
+                    onClose={() => setViewingInvestmentsInvestor(null)}
                 />
             )}
         </div>

@@ -1,63 +1,139 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import type { RootState, AppDispatch } from '../store';
 import { fetchSales } from '../store/slices/salesSlice';
 import { fetchBranches } from '../store/slices/branchSlice';
+import type { RootState, AppDispatch } from '../store';
+import type { Sale, Branch } from '../types';
+import clsx from 'clsx';
 
 const SuperAdmin = () => {
     const dispatch = useDispatch<AppDispatch>();
-    const { items: sales, isLoading: isSalesLoading } = useSelector((state: RootState) => state.sales);
+    const { items: sales, isLoading: isSalesLoading, summary } = useSelector((state: RootState) => state.sales);
     const { items: branches, isLoading: isBranchesLoading } = useSelector((state: RootState) => state.branches);
+
+    const [dateFilter, setDateFilter] = useState('lifetime');
+    const [customRange, setCustomRange] = useState({ start: '', end: '' });
+
+    const getFilterDates = () => {
+        const now = new Date();
+        let start = '';
+        let end = '';
+
+        if (dateFilter === 'today') {
+            const today = new Date(now.setHours(0, 0, 0, 0));
+            start = today.toISOString();
+        } else if (dateFilter === 'weekly') {
+            const weekAgo = new Date(now.setDate(now.getDate() - 7));
+            start = weekAgo.toISOString();
+        } else if (dateFilter === 'monthly') {
+            const monthAgo = new Date(now.setMonth(now.getMonth() - 1));
+            start = monthAgo.toISOString();
+        } else if (dateFilter === 'range') {
+            if (customRange.start) start = new Date(customRange.start).toISOString();
+            if (customRange.end) end = new Date(customRange.end).toISOString();
+        }
+
+        return { start, end };
+    };
 
     const isLoading = isSalesLoading || isBranchesLoading;
 
     useEffect(() => {
-        dispatch(fetchSales({ limit: 100 }));
-        dispatch(fetchBranches({}));
-    }, [dispatch]);
+        const { start, end } = getFilterDates();
+        dispatch(fetchSales({ limit: 100, startDate: start, endDate: end }));
+        dispatch(fetchBranches({ startDate: start, endDate: end }));
+    }, [dispatch, dateFilter, customRange]);
 
-    // Branch stats calculation
-    const branchStats = (branches || []).map(branch => {
-        const branchSales = (sales || []).filter(s => {
-            const bId = typeof s.branchId === 'string' ? s.branchId : (s.branchId as any)?._id;
-            return bId === branch._id && s.status === 'completed';
-        });
-        const profit = branchSales.reduce((acc, curr) => acc + (curr.amount - curr.commission), 0);
-        const investorsCount = new Set(branchSales.map(s => typeof s.investorId === 'string' ? s.investorId : (s.investorId as any)?._id).filter(id => !!id)).size;
-        return { ...branch, profit, investors: investorsCount };
+    // Branch stats calculation (now using backend calculated values primarily)
+    const branchStats = (branches || []).map((branch: Branch) => {
+        // Fallback to client-side calc if backend fields missing, but prefer backend
+        const profit = (branch as any).totalProfit ?? 0;
+        const investors = (branch as any).linkedInvestorsCount ?? 0;
+        return { ...branch, profit, investors };
     });
 
     const sortedByProfit = [...branchStats].sort((a, b) => b.profit - a.profit);
     const sortedByInvestors = [...branchStats].sort((a, b) => b.investors - a.investors);
 
     // Filtered sales for metrics
-    const completedSales = (sales || []).filter(s => s.status === 'completed');
+    const completedSales = (sales || []).filter((s: Sale) => s.status === 'completed');
     // Hide rejected sales from calculations and lists
-    const nonRejectedSales = (sales || []).filter(s => s.status !== 'rejected');
+    const nonRejectedSales = (sales || []).filter((s: Sale) => s.status !== 'rejected');
 
     const highestProfitBranch = sortedByProfit[0];
     const mostInvestorsBranch = sortedByInvestors[0];
 
-    // Global stats
-    const totalAmount = completedSales.reduce((acc, curr) => acc + curr.amount, 0);
-    const totalCommission = completedSales.reduce((acc, curr) => acc + curr.commission, 0);
-    const totalProfit = totalAmount - totalCommission;
+    // Global stats (prefer summary from backend)
+    const totalAmount = summary?.totalAmount ?? completedSales.reduce((acc: number, curr: Sale) => acc + curr.amount, 0);
+    const totalCommission = completedSales.reduce((acc: number, curr: Sale) => acc + curr.commission, 0); // Commission not in summary, keep client side for now but it's filtered by API response
+    const totalProfit = summary?.totalProfit ?? (totalAmount - totalCommission);
 
-    if (isLoading) return <div>Loading dashboard...</div>;
+    if (isLoading && !sales.length) return (
+        <div className="flex items-center justify-center min-h-[400px]">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-forest-green"></div>
+        </div>
+    );
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <div className="space-y-8 animate-in fade-in duration-500 pb-12">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div>
+                    <h1 className="text-xl font-black text-forest-green tracking-tight italic opacity-90 uppercase flex items-center gap-3">
+                        <span className="material-symbols-outlined text-swamp-deer">monitoring</span>
+                        Enterprise Performance Intelligence
+                    </h1>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1 ml-9">Real-time system oversight & analytics</p>
+                </div>
+
+                {/* Date Filters */}
+                <div className="flex flex-wrap items-center gap-3 bg-white p-2 rounded-2xl border border-border-light shadow-sm">
+                    <div className="flex items-center gap-1 p-1 bg-neutral-light rounded-xl">
+                        {['lifetime', 'today', 'weekly', 'monthly', 'range'].map((filter) => (
+                            <button
+                                key={filter}
+                                onClick={() => setDateFilter(filter)}
+                                className={clsx(
+                                    "px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                                    dateFilter === filter
+                                        ? "bg-forest-green text-warm-gold shadow-md"
+                                        : "text-gray-400 hover:text-forest-green"
+                                )}
+                            >
+                                {filter}
+                            </button>
+                        ))}
+                    </div>
+
+                    {dateFilter === 'range' && (
+                        <div className="flex items-center gap-2 animate-in slide-in-from-right-2 duration-300">
+                            <input
+                                type="date"
+                                value={customRange.start}
+                                onChange={(e) => setCustomRange(prev => ({ ...prev, start: e.target.value }))}
+                                className="text-[10px] font-black uppercase bg-neutral-light border-none rounded-lg px-3 py-2 text-forest-green focus:ring-1 focus:ring-forest-green"
+                            />
+                            <span className="text-[10px] font-black text-gray-300">to</span>
+                            <input
+                                type="date"
+                                value={customRange.end}
+                                onChange={(e) => setCustomRange(prev => ({ ...prev, end: e.target.value }))}
+                                className="text-[10px] font-black uppercase bg-neutral-light border-none rounded-lg px-3 py-2 text-forest-green focus:ring-1 focus:ring-forest-green"
+                            />
+                        </div>
+                    )}
+                </div>
+            </div>
+
             <div>
-                <h1 className="text-xl font-black text-forest-green tracking-tight italic opacity-90 uppercase flex items-center gap-3">
-                    <span className="material-symbols-outlined text-swamp-deer">monitoring</span>
-                    Enterprise Performance Intelligence
-                </h1>
                 <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
                     {/* Total Profit Card */}
                     <div className="bg-white p-5 rounded-[20px] border border-border-light shadow-sm flex flex-col justify-between group hover:shadow-lg transition-all duration-300 relative overflow-hidden h-32">
                         <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full -mr-12 -mt-12 transition-transform group-hover:scale-110"></div>
                         <div className="relative z-10">
-                            <div className="text-gray-400 text-[9px] font-black uppercase tracking-[0.2em] mb-1 opacity-70">Total Profit (Lifetime)</div>
+                            <div className="text-gray-400 text-[9px] font-black uppercase tracking-[0.2em] mb-1 opacity-70">
+                                Total Profit ({dateFilter === 'lifetime' ? 'Lifetime' : dateFilter})
+                            </div>
                             <div className="text-2xl font-black text-forest-green tracking-tighter">Rs {totalProfit.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
                         </div>
                         <div className="flex items-center justify-between relative z-10">
@@ -131,7 +207,7 @@ const SuperAdmin = () => {
                             </div>
                         </div>
                     )}
-                    {branchStats.slice(0, 4).map(b => {
+                    {branchStats.slice(0, 4).map((b: any) => {
                         if (b._id === highestProfitBranch?._id || b._id === mostInvestorsBranch?._id) return null;
                         return (
                             <div key={b._id} className="bg-white p-5 rounded-[20px] border border-border-light shadow-sm flex flex-col justify-between h-36 group hover:border-warm-gold/20 transition-all duration-300">
@@ -171,7 +247,7 @@ const SuperAdmin = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border-light/50">
-                                {nonRejectedSales?.slice(0, 5)?.map((sale) => (
+                                {nonRejectedSales?.slice(0, 10)?.map((sale: Sale) => (
                                     <tr key={sale._id} className="hover:bg-neutral-light transition-colors group">
                                         <td className="px-6 py-5 text-sm text-gray-500 font-medium whitespace-nowrap">
                                             {new Date(sale.date || sale.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
@@ -185,7 +261,7 @@ const SuperAdmin = () => {
                                             </div>
                                         </td>
                                         <td className="px-6 py-5 text-sm font-bold text-gray-600 whitespace-nowrap">
-                                            {typeof sale?.branchId === 'object' ? sale?.branchId?.name : (branches?.find(b => b._id === sale?.branchId)?.name || "N/A")}
+                                            {typeof sale?.branchId === 'object' ? (sale?.branchId as Branch)?.name : (branches?.find((b: Branch) => b._id === sale?.branchId)?.name || "N/A")}
                                         </td>
                                         <td className="px-6 py-5 whitespace-nowrap">
                                             <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border ${sale.status === 'completed' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' :

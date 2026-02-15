@@ -26,11 +26,11 @@ interface WithdrawalRequest {
     createdAt: string;
 }
 
-const ApproveWithdrawals = () => {
+const WithdrawalHistory = () => {
     const [requests, setRequests] = useState<WithdrawalRequest[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
-    const [statusFilter, setStatusFilter] = useState('pending');
+    const [statusFilter, setStatusFilter] = useState('all');
     const [processing, setProcessing] = useState<string | null>(null);
     const [selectedRequest, setSelectedRequest] = useState<WithdrawalRequest | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -38,13 +38,12 @@ const ApproveWithdrawals = () => {
     const fetchRequests = async () => {
         try {
             setLoading(true);
-            // The backend controller handles role-based query
             const response = await api.get('/withdrawals');
             if (response.data.success) {
                 setRequests(response.data.data);
             }
         } catch (error: any) {
-            toast.error(error.response?.data?.message || 'Failed to fetch withdrawal requests');
+            toast.error(error.response?.data?.message || 'Failed to fetch withdrawal history');
         } finally {
             setLoading(false);
         }
@@ -61,7 +60,6 @@ const ApproveWithdrawals = () => {
 
             if (response.data.success) {
                 toast.success(`Request ${status} successfully`);
-                // Update local state
                 setRequests(prev => prev.map(r => r._id === id ? { ...r, status } : r));
             }
         } catch (error: any) {
@@ -87,11 +85,11 @@ const ApproveWithdrawals = () => {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
                     <div className="p-3 bg-forest-green/10 rounded-2xl">
-                        <Wallet className="w-6 h-6 text-forest-green" />
+                        <History className="w-6 h-6 text-forest-green" />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-bold text-gray-900">Withdrawal Approvals</h2>
-                        <p className="text-sm text-gray-500">Review and process partner withdrawal requests</p>
+                        <h2 className="text-2xl font-bold text-gray-900">Withdrawal History</h2>
+                        <p className="text-sm text-gray-500">Track and review all previous withdrawal transactions</p>
                     </div>
                 </div>
             </div>
@@ -115,10 +113,10 @@ const ApproveWithdrawals = () => {
                         onChange={(e) => setStatusFilter(e.target.value)}
                         className="flex-1 bg-neutral-light border-none rounded-xl text-sm py-2 px-4 focus:ring-2 focus:ring-forest-green/20"
                     >
-                        <option value="pending">Pending Only</option>
+                        <option value="all">All Requests</option>
+                        <option value="pending">Pending</option>
                         <option value="approved">Approved</option>
                         <option value="rejected">Rejected</option>
-                        <option value="all">All Requests</option>
                     </select>
                 </div>
             </div>
@@ -134,7 +132,7 @@ const ApproveWithdrawals = () => {
                         <div className="p-4 bg-gray-50 rounded-full">
                             <History className="w-12 h-12 opacity-20" />
                         </div>
-                        <p className="font-medium text-lg tracking-tight">No withdrawal requests found</p>
+                        <p className="font-medium text-lg tracking-tight">No history found</p>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
@@ -406,4 +404,4 @@ const ApproveWithdrawals = () => {
     );
 };
 
-export default ApproveWithdrawals;
+export default WithdrawalHistory;
