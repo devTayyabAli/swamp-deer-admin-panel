@@ -3,6 +3,7 @@ import { getPlans, upsertPlan, getBranches, getUsers } from '../services/dataSer
 import type { InvestmentPlan, Branch, User, PhaseConfig, RankTarget } from '../types';
 import toast from 'react-hot-toast';
 import clsx from 'clsx';
+import SearchableDropdown from '../components/SearchableDropdown';
 
 const ManagePlans = () => {
     const [loading, setLoading] = useState(true);
@@ -175,16 +176,16 @@ const ManagePlans = () => {
                     )}
 
                     {scope === 'user' && (
-                        <div className="flex-1 space-y-1.5 animate-in slide-in-from-left duration-300">
-                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Select Sales/Team Lead</label>
-                            <select
-                                className="w-full rounded-xl border-border-light bg-neutral-light/50 focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 text-sm p-3 font-semibold transition-all"
+                        <div className="flex-1 animate-in slide-in-from-left duration-300">
+                            <SearchableDropdown
+                                label="Select Sales/Team Lead"
+                                placeholder="-- Choose User --"
+                                options={users}
                                 value={scopeId}
-                                onChange={(e) => setScopeId(e.target.value)}
-                            >
-                                <option value="">-- Choose User --</option>
-                                {users.map(u => <option key={u._id} value={u._id}>{u.name} ({u.role.replace('_', ' ')})</option>)}
-                            </select>
+                                onChange={(val) => setScopeId(val)}
+                                searchPlaceholder="Search by name, email or username..."
+                                icon="person"
+                            />
                         </div>
                     )}
                 </div>

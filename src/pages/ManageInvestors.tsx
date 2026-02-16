@@ -856,6 +856,7 @@ const ManageInvestors = () => {
                                 <tr>
                                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.15em]">Investor Name</th>
                                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.15em]">Phone Number</th>
+                                    <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.15em]">Upline</th>
                                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.15em]">Amount Invested</th>
                                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.15em]">Date of Joining</th>
                                     <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.15em]">Product Status</th>
@@ -872,6 +873,23 @@ const ManageInvestors = () => {
                                             <div className="text-[11px] text-gray-500 font-medium">{investor.email}</div>
                                         </td>
                                         <td className="px-6 py-4 text-sm text-gray-600 whitespace-nowrap">{investor.phone}</td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            {investor.upline && typeof investor.upline !== 'string' ? (
+                                                <div className="flex flex-col">
+                                                    <span className="text-[13px] font-bold text-gray-900 leading-tight">
+                                                        {investor.upline.name}
+                                                    </span>
+                                                    <span className="text-[10px] text-gray-500 font-medium">
+                                                        {investor.upline.phone || 'No Phone'}
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center gap-1.5 opacity-40">
+                                                    <span className="material-symbols-outlined text-sm">home_work</span>
+                                                    <span className="text-[10px] font-black uppercase tracking-widest">Internal / HQ</span>
+                                                </div>
+                                            )}
+                                        </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex flex-col">
                                                 <span className="text-sm font-black text-gray-900 tracking-tight">

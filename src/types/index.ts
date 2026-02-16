@@ -51,6 +51,7 @@ export interface Sale {
     user: string | User;
     branchId: string | Branch;
     investorId?: string | Investor | User;
+    referrerId?: string | User;
     customerName: string;
     description: string;
     amount: number;

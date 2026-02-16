@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import api from '../lib/axios';
 import { fetchSales } from '../store/slices/salesSlice';
 import { fetchBranches } from '../store/slices/branchSlice';
 import type { RootState, AppDispatch } from '../store';
@@ -13,6 +14,7 @@ const SuperAdmin = () => {
 
     const [dateFilter, setDateFilter] = useState('lifetime');
     const [customRange, setCustomRange] = useState({ start: '', end: '' });
+    const [withdrawalSummary, setWithdrawalSummary] = useState({ totalWithdrawn: 0, totalPending: 0 });
 
     const getFilterDates = () => {
         const now = new Date();
@@ -42,6 +44,19 @@ const SuperAdmin = () => {
         const { start, end } = getFilterDates();
         dispatch(fetchSales({ limit: 100, startDate: start, endDate: end }));
         dispatch(fetchBranches({ startDate: start, endDate: end }));
+
+        // Fetch withdrawal summary
+        const fetchWithdrawals = async () => {
+            try {
+                const response = await api.get('/withdrawals');
+                if (response.data.success) {
+                    setWithdrawalSummary(response.data.data.summary || { totalWithdrawn: 0, totalPending: 0 });
+                }
+            } catch (error) {
+                console.error('Failed to fetch withdrawal summary:', error);
+            }
+        };
+        fetchWithdrawals();
     }, [dispatch, dateFilter, customRange]);
 
     // Branch stats calculation (now using backend calculated values primarily)
@@ -125,7 +140,7 @@ const SuperAdmin = () => {
             </div>
 
             <div>
-                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
 
                     {/* Total Profit Card */}
                     <div className="bg-white p-5 rounded-[20px] border border-border-light shadow-sm flex flex-col justify-between group hover:shadow-lg transition-all duration-300 relative overflow-hidden h-32">
@@ -156,7 +171,7 @@ const SuperAdmin = () => {
                     </div>
 
                     {/* Total Commission Paid Card */}
-                    <div className="bg-white p-5 rounded-[20px] border border-border-light shadow-sm flex flex-col justify-between group hover:shadow-lg transition-all duration-300 relative overflow-hidden h-32">
+                    {/* <div className="bg-white p-5 rounded-[20px] border border-border-light shadow-sm flex flex-col justify-between group hover:shadow-lg transition-all duration-300 relative overflow-hidden h-32">
                         <div className="absolute top-0 right-0 w-24 h-24 bg-swamp-deer/5 rounded-full -mr-12 -mt-12 transition-transform group-hover:scale-110"></div>
                         <div className="relative z-10">
                             <div className="text-gray-400 text-[9px] font-black uppercase tracking-[0.2em] mb-1 opacity-70">Total Commission Paid</div>
@@ -166,9 +181,33 @@ const SuperAdmin = () => {
                             <span className="px-2 py-0.5 rounded-lg bg-swamp-deer/10 text-swamp-deer text-[8px] font-black uppercase tracking-widest border border-swamp-deer/10">Real-time Sync</span>
                             <span className="material-symbols-outlined text-swamp-deer/40 text-lg group-hover:rotate-12 transition-transform">schedule</span>
                         </div>
+                    </div> */}
+
+                    {/* Total Withdraw Card */}
+                    <div className="bg-white p-5 rounded-[20px] border border-border-light shadow-sm flex flex-col justify-between group hover:shadow-lg transition-all duration-300 relative overflow-hidden h-32">
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full -mr-12 -mt-12 transition-transform group-hover:scale-110"></div>
+                        <div className="relative z-10">
+                            <div className="text-gray-400 text-[9px] font-black uppercase tracking-[0.2em] mb-1 opacity-70">Total Withdrawals</div>
+                            <div className="text-2xl font-black text-forest-green tracking-tighter">Rs {withdrawalSummary.totalWithdrawn.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                        </div>
+                        <div className="flex items-center justify-between relative z-10">
+                            <span className="px-2 py-0.5 rounded-lg bg-blue-500/10 text-blue-600 text-[8px] font-black uppercase tracking-widest border border-blue-500/10">Processed Payouts</span>
+                            <span className="material-symbols-outlined text-blue-500/40 text-lg group-hover:rotate-12 transition-transform">payments</span>
+                        </div>
                     </div>
 
-
+                    {/* Pending Withdraw Card */}
+                    <div className="bg-white p-5 rounded-[20px] border border-border-light shadow-sm flex flex-col justify-between group hover:shadow-lg transition-all duration-300 relative overflow-hidden h-32">
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/5 rounded-full -mr-12 -mt-12 transition-transform group-hover:scale-110"></div>
+                        <div className="relative z-10">
+                            <div className="text-gray-400 text-[9px] font-black uppercase tracking-[0.2em] mb-1 opacity-70">Pending Withdrawals</div>
+                            <div className="text-2xl font-black text-forest-green tracking-tighter">Rs {withdrawalSummary.totalPending.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+                        </div>
+                        <div className="flex items-center justify-between relative z-10">
+                            <span className="px-2 py-0.5 rounded-lg bg-amber-500/10 text-amber-600 text-[8px] font-black uppercase tracking-widest border border-amber-500/10">In Queue</span>
+                            <span className="material-symbols-outlined text-amber-500/40 text-lg group-hover:rotate-12 transition-transform">pending_actions</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 

@@ -25,7 +25,7 @@ const ApproveRewards = () => {
     const [requests, setRequests] = useState<RewardRequest[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
-    const [statusFilter, setStatusFilter] = useState('pending');
+    const [statusFilter, setStatusFilter] = useState('all');
     const [processing, setProcessing] = useState<string | null>(null);
 
     const fetchRequests = async () => {
@@ -53,7 +53,8 @@ const ApproveRewards = () => {
 
             if (response.data.success) {
                 toast.success(`Request ${status} successfully`);
-                setRequests(prev => prev.filter(r => r._id !== id));
+                // Update local state instead of filtering out
+                setRequests(prev => prev.map(r => r._id === id ? { ...r, status } : r));
             }
         } catch (error: any) {
             toast.error(error.response?.data?.message || 'Failed to update request');
@@ -142,7 +143,12 @@ const ApproveRewards = () => {
                                                     <User className="w-5 h-5 text-forest-green" />
                                                 </div>
                                                 <div>
-                                                    <p className="font-bold text-gray-900 leading-none mb-1">{request.userId.name}</p>
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <p className="font-bold text-gray-900 leading-none">{request.userId.name}</p>
+                                                        {request.status === 'pending' && (
+                                                            <span className="px-1.5 py-0.5 bg-swamp-deer/10 text-swamp-deer text-[8px] font-black rounded uppercase tracking-widest animate-pulse">New</span>
+                                                        )}
+                                                    </div>
                                                     <p className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">ID: {request.userId.userName}</p>
                                                 </div>
                                             </div>

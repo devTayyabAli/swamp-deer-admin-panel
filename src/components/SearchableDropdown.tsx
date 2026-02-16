@@ -4,6 +4,8 @@ interface Option {
     _id: string;
     fullName?: string;
     name?: string;
+    userName?: string;
+    email?: string;
     phone?: string;
     [key: string]: any;
 }
@@ -28,7 +30,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
     label,
     onAddNew,
     addNewLabel = "Add New",
-    searchPlaceholder = "Search by name or phone...",
+    searchPlaceholder = "Search by name, email or username...",
     icon = "search"
 }) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -36,13 +38,15 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
     const dropdownRef = useRef<HTMLDivElement>(null);
 
     const selectedOption = options.find(opt => opt._id === value);
-    const displayName = selectedOption ? (selectedOption.fullName || selectedOption.name) : '';
+    const displayName = selectedOption ? (selectedOption.fullName || selectedOption.name || selectedOption.userName) : '';
 
     const filteredOptions = (options || []).filter(opt => {
         const name = (opt.fullName || opt.name || '').toLowerCase();
+        const userName = (opt.userName || '').toLowerCase();
+        const email = (opt.email || '').toLowerCase();
         const phone = (opt.phone || '').toLowerCase();
         const search = searchTerm.toLowerCase();
-        return name.includes(search) || phone.includes(search);
+        return name.includes(search) || userName.includes(search) || email.includes(search) || phone.includes(search);
     });
 
     useEffect(() => {
@@ -60,7 +64,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
             <div className="flex justify-between items-center mb-0.5">
                 <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">{label}</label>
                 {onAddNew && (
-                     <button 
+                    <button
                         type="button"
                         onClick={onAddNew}
                         className="text-[9px] font-black uppercase tracking-widest text-[#D4AF37] opacity-60 hover:opacity-100 border border-[#D4AF37]/20 px-2 py-0.5 rounded transition-all"
@@ -69,7 +73,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
                     </button>
                 )}
             </div>
-            
+
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
@@ -101,7 +105,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
                             />
                         </div>
                     </div>
-                    
+
                     <div className="max-h-[280px] overflow-y-auto p-2">
                         {filteredOptions.length > 0 ? (
                             filteredOptions.map((option) => (
@@ -116,8 +120,13 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
                                     className={`w-full flex flex-col items-start gap-0.5 px-3 py-2.5 rounded-lg transition-colors text-left ${value === option._id ? 'bg-[#006820]/5 text-[#006820]' : 'hover:bg-[#fbfcfa]'}`}
                                 >
                                     <span className="text-[13px] font-bold">
-                                        {option.fullName || option.name}
+                                        {option.fullName || option.name || option.userName}
                                     </span>
+                                    {option.email && (
+                                        <span className="text-[11px] font-medium opacity-60">
+                                            {option.email}
+                                        </span>
+                                    )}
                                     {option.phone && (
                                         <span className="text-[11px] font-medium opacity-60 italic">
                                             {option.phone}

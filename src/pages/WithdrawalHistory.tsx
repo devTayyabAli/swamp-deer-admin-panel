@@ -31,6 +31,7 @@ const WithdrawalHistory = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
+    const [methodFilter, setMethodFilter] = useState('all');
     const [processing, setProcessing] = useState<string | null>(null);
     const [selectedRequest, setSelectedRequest] = useState<WithdrawalRequest | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -40,7 +41,7 @@ const WithdrawalHistory = () => {
             setLoading(true);
             const response = await api.get('/withdrawals');
             if (response.data.success) {
-                setRequests(response.data.data);
+                setRequests(response.data.data.items || response.data.data);
             }
         } catch (error: any) {
             toast.error(error.response?.data?.message || 'Failed to fetch withdrawal history');
@@ -76,8 +77,9 @@ const WithdrawalHistory = () => {
             r.amount.toString().includes(searchTerm);
 
         const matchesStatus = statusFilter === 'all' || r.status === statusFilter;
+        const matchesMethod = methodFilter === 'all' || r.method === methodFilter;
 
-        return matchesSearch && matchesStatus;
+        return matchesSearch && matchesStatus && matchesMethod;
     });
 
     return (
@@ -117,6 +119,18 @@ const WithdrawalHistory = () => {
                         <option value="pending">Pending</option>
                         <option value="approved">Approved</option>
                         <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+                <div className="flex items-center gap-2">
+                    <Wallet className="text-gray-400 w-4 h-4" />
+                    <select
+                        value={methodFilter}
+                        onChange={(e) => setMethodFilter(e.target.value)}
+                        className="flex-1 bg-neutral-light border-none rounded-xl text-sm py-2 px-4 focus:ring-2 focus:ring-forest-green/20"
+                    >
+                        <option value="all">All Methods</option>
+                        <option value="BANK">Bank Transfer</option>
+                        <option value="CASH">Cash / USDT</option>
                     </select>
                 </div>
             </div>

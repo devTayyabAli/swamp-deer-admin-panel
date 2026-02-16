@@ -41,7 +41,7 @@ const ApproveWithdrawals = () => {
             // The backend controller handles role-based query
             const response = await api.get('/withdrawals');
             if (response.data.success) {
-                setRequests(response.data.data);
+                setRequests(response.data.data.items || response.data.data);
             }
         } catch (error: any) {
             toast.error(error.response?.data?.message || 'Failed to fetch withdrawal requests');
