@@ -16,6 +16,7 @@ import ApproveWithdrawals from './pages/ApproveWithdrawals';
 import WithdrawalHistory from './pages/WithdrawalHistory';
 import InvestorTeam from './pages/InvestorTeam';
 import ManagePlans from './pages/ManagePlans';
+import ActivityLogs from './pages/ActivityLogs';
 
 import { Toaster } from 'react-hot-toast';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -49,6 +50,7 @@ function App() {
           <Route path="/approve-withdrawals" element={<ApproveWithdrawals />} />
           <Route path="/withdrawal-history" element={<WithdrawalHistory />} />
           <Route path="/manage-plans" element={<ManagePlans />} />
+          <Route path="/activity-logs" element={<ActivityLogs />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />

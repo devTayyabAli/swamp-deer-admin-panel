@@ -204,6 +204,16 @@ const AdminLayout = () => {
                             </span>
                         </NavLink>
 
+                        <NavLink to="/activity-logs" className={({ isActive }) => navLinkClasses({ isActive })}>
+                            <span className="material-symbols-outlined shrink-0">receipt_long</span>
+                            <span className={clsx(
+                                "font-medium whitespace-nowrap transition-opacity duration-300",
+                                !isSidebarPinned && "lg:opacity-0 lg:group-hover:opacity-100"
+                            )}>
+                                Activity Logs
+                            </span>
+                        </NavLink>
+
                         <NavLink to="/change-password" className={({ isActive }) => navLinkClasses({ isActive })}>
                             <span className="material-symbols-outlined shrink-0">lock_reset</span>
                             <span className={clsx(

@@ -26,6 +26,36 @@ export const getInvestors = async (page = 1, limit = 10, filters: { startDate?: 
     return response.data;
 };
 
+export const searchUsers = async (query: string): Promise<User[]> => {
+    const response = await api.get<User[]>(`/investors/search?q=${encodeURIComponent(query)}`);
+    return response.data;
+};
+
+export const getActivityLogs = async (params: {
+    page?: number;
+    limit?: number;
+    adminId?: string;
+    actionCategory?: string;
+    startDate?: string;
+    endDate?: string;
+    search?: string;
+}) => {
+    const queryParams = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== '') {
+            queryParams.append(key, value.toString());
+        }
+    });
+
+    const response = await api.get(`/admin/activity-logs?${queryParams.toString()}`);
+    return response.data;
+};
+
+export const getActiveAdmins = async () => {
+    const response = await api.get('/admin/activity-logs/admins');
+    return response.data;
+};
+
 export const toggleInvestorStatus = async (id: string): Promise<any> => {
     const response = await api.put<any>(`/investors/${id}/status`);
     return response.data;
