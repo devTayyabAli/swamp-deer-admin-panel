@@ -1,6 +1,7 @@
 export interface User {
     _id: string;
     name: string;
+    userName?: string;
     email: string;
     role: 'super_admin' | 'branch_manager' | 'sales_rep' | 'investor' | 'referrer';
     phone?: string;
@@ -30,6 +31,7 @@ export interface Investor {
     _id: string;
     fullName: string;
     name?: string;
+    userName?: string;
     email: string;
     phone: string;
     address: string;

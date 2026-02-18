@@ -717,6 +717,7 @@ const ManageInvestors = () => {
     const isLoading = isInvestorsLoading && (investors || []).length === 0;
 
     const displayInvestors = investors || [];
+    console.log("displayInvestors", displayInvestors);
 
     if (isLoading) {
         return (
@@ -877,7 +878,7 @@ const ManageInvestors = () => {
                                             {investor.upline && typeof investor.upline !== 'string' ? (
                                                 <div className="flex flex-col">
                                                     <span className="text-[13px] font-bold text-gray-900 leading-tight">
-                                                        {investor.upline.name}
+                                                        {investor.upline.userName}
                                                     </span>
                                                     <span className="text-[10px] text-gray-500 font-medium">
                                                         {investor.upline.phone || 'No Phone'}
