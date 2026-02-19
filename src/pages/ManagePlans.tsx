@@ -377,6 +377,8 @@ const ManagePlans = () => {
                     {/* GENERAL SETTINGS */}
                     <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-border-light overflow-hidden">
                         <div className="p-6">
+                            {/* Overall Profit Cap Disabled */}
+                            {/* 
                             <div className="flex items-center gap-6">
                                 <div className="space-y-1.5 flex-1">
                                     <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Overall Profit Cap (X Multiple)</label>
@@ -388,6 +390,16 @@ const ManagePlans = () => {
                                     />
                                     <p className="text-[10px] text-gray-400 font-medium px-1 italic mt-1">Example: 5 means total earnings are capped at 5x the investment.</p>
                                 </div>
+                                <button
+                                    type="submit"
+                                    disabled={saving}
+                                    className="px-12 py-4 rounded-xl bg-forest-green hover:bg-forest-green/90 text-warm-gold text-sm font-black uppercase tracking-widest transition-all shadow-xl shadow-emerald-900/20 disabled:opacity-50"
+                                >
+                                    {saving ? 'Processing...' : 'Save Configuration'}
+                                </button>
+                            </div>
+                            */}
+                            <div className="flex justify-end">
                                 <button
                                     type="submit"
                                     disabled={saving}
