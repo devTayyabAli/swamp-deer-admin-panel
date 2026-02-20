@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Users, User, ArrowUpRight, TrendingUp, Wallet, Calendar } from 'lucide-react';
+import { X, Users } from 'lucide-react';
 import { getInvestorTeam, type InvestorTeam, type TeamMember } from '../services/dataService';
 import toast from 'react-hot-toast';
 import clsx from 'clsx';

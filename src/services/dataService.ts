@@ -73,6 +73,7 @@ export interface TeamMember extends Partial<Investor> {
     profit: number;
     date: string;
     upline: string;
+    uplineId?: string;
     type: 'direct' | 'indirect';
     level?: number;
 }
