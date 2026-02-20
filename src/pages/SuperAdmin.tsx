@@ -62,12 +62,12 @@ const SuperAdmin = () => {
     // Branch stats calculation (now using backend calculated values primarily)
     const branchStats = (branches || []).map((branch: Branch) => {
         // Fallback to client-side calc if backend fields missing, but prefer backend
-        const profit = (branch as any).totalProfit ?? 0;
+        const salesVolume = (branch as any).totalSalesAmount ?? 0;
         const investors = (branch as any).linkedInvestorsCount ?? 0;
-        return { ...branch, profit, investors };
+        return { ...branch, salesVolume, investors };
     });
 
-    const sortedByProfit = [...branchStats].sort((a, b) => b.profit - a.profit);
+    const sortedBySales = [...branchStats].sort((a, b) => b.salesVolume - a.salesVolume);
     const sortedByInvestors = [...branchStats].sort((a, b) => b.investors - a.investors);
 
     // Filtered sales for metrics
@@ -75,7 +75,7 @@ const SuperAdmin = () => {
     // Hide rejected sales from calculations and lists
     const nonRejectedSales = (sales || []).filter((s: Sale) => s.status !== 'rejected');
 
-    const highestProfitBranch = sortedByProfit[0];
+    const highestSalesBranch = sortedBySales[0];
     const mostInvestorsBranch = sortedByInvestors[0];
 
     // Global stats (prefer summary from backend)
@@ -217,15 +217,15 @@ const SuperAdmin = () => {
                     Branch Performance Analysis
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {highestProfitBranch && (
+                    {highestSalesBranch && (
                         <div className="bg-forest-green text-white p-5 rounded-[20px] shadow-lg ring-1 ring-warm-gold/20 relative overflow-hidden group h-36 flex flex-col justify-between">
                             <div className="absolute top-0 right-0 p-2 opacity-5 group-hover:scale-125 transition-transform duration-700">
                                 <span className="material-symbols-outlined text-7xl font-black">insights</span>
                             </div>
                             <div className="relative z-10">
                                 <span className="text-[8px] font-black px-2 py-0.5 bg-warm-gold text-forest-green rounded uppercase tracking-widest mb-3 inline-block shadow-sm">Top Performer</span>
-                                <div className="text-[10px] opacity-60 uppercase tracking-[0.2em] font-black mb-1">{highestProfitBranch.name}</div>
-                                <div className="text-2xl font-black text-warm-gold tracking-tighter">Rs {highestProfitBranch.profit.toLocaleString()}</div>
+                                <div className="text-[10px] opacity-60 uppercase tracking-[0.2em] font-black mb-1">{highestSalesBranch.name}</div>
+                                <div className="text-2xl font-black text-warm-gold tracking-tighter">Rs {highestSalesBranch.salesVolume.toLocaleString()}</div>
                             </div>
                             <div className="relative z-10 flex items-center gap-1.5 text-warm-gold/60">
                                 <span className="material-symbols-outlined text-sm">trending_up</span>
@@ -233,12 +233,12 @@ const SuperAdmin = () => {
                             </div>
                         </div>
                     )}
-                    {mostInvestorsBranch && mostInvestorsBranch._id !== highestProfitBranch?._id && (
+                    {mostInvestorsBranch && mostInvestorsBranch._id !== highestSalesBranch?._id && (
                         <div className="bg-white p-5 rounded-[20px] border border-border-light shadow-sm flex flex-col justify-between h-36 group hover:border-warm-gold/30 transition-all duration-300">
                             <div className="relative z-10">
                                 <span className="text-[8px] font-black px-2 py-0.5 bg-neutral-light text-swamp-deer rounded uppercase tracking-widest mb-3 inline-block border border-border-light">Active Network</span>
                                 <div className="text-[10px] text-gray-400 uppercase tracking-[0.2em] font-black mb-1">{mostInvestorsBranch.name}</div>
-                                <div className="text-2xl font-black text-forest-green tracking-tighter">Rs {mostInvestorsBranch.profit.toLocaleString()}</div>
+                                <div className="text-2xl font-black text-forest-green tracking-tighter">Rs {mostInvestorsBranch.salesVolume.toLocaleString()}</div>
                             </div>
                             <div className="relative z-10 flex items-center justify-between text-swamp-deer/40">
                                 <span className="text-[8px] font-black uppercase tracking-widest">Network Growth</span>
@@ -247,12 +247,12 @@ const SuperAdmin = () => {
                         </div>
                     )}
                     {branchStats.slice(0, 4).map((b: any) => {
-                        if (b._id === highestProfitBranch?._id || b._id === mostInvestorsBranch?._id) return null;
+                        if (b._id === highestSalesBranch?._id || b._id === mostInvestorsBranch?._id) return null;
                         return (
                             <div key={b._id} className="bg-white p-5 rounded-[20px] border border-border-light shadow-sm flex flex-col justify-between h-36 group hover:border-warm-gold/20 transition-all duration-300">
                                 <div className="relative">
                                     <div className="text-[10px] text-gray-400 uppercase tracking-[0.2em] font-black mb-1">{b.name}</div>
-                                    <div className="text-2xl font-black text-forest-green tracking-tighter">Rs {b.profit.toLocaleString()}</div>
+                                    <div className="text-2xl font-black text-forest-green tracking-tighter">Rs {b.salesVolume.toLocaleString()}</div>
                                 </div>
                                 <div className="flex items-center justify-between text-gray-300">
                                     <span className="text-[8px] font-black uppercase tracking-widest">Regional Hub</span>

@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../store';
 import { fetchBranches } from '../store/slices/branchSlice';
-import { getUsers, updateBranch as updateBranchService } from '../services/dataService';
+import { getUsers, updateBranch as updateBranchService, getInvestors } from '../services/dataService';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import type { User, Branch } from '../types';
+import type { User, Branch, Investor } from '../types';
 import clsx from 'clsx';
 
 const ManageBranches = () => {
@@ -21,6 +21,13 @@ const ManageBranches = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [activeCityFilter, setActiveCityFilter] = useState<string | null>(null);
     const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+    const [activeActionDropdown, setActiveActionDropdown] = useState<string | null>(null);
+
+    // Linked Investors Modal State
+    const [isInvestorsModalOpen, setIsInvestorsModalOpen] = useState(false);
+    const [selectedBranchForInvestors, setSelectedBranchForInvestors] = useState<Branch | null>(null);
+    const [branchInvestors, setBranchInvestors] = useState<Investor[]>([]);
+    const [isFetchingInvestors, setIsFetchingInvestors] = useState(false);
 
     const [formData, setFormData] = useState({
         name: '',
@@ -70,6 +77,23 @@ const ManageBranches = () => {
             manager: typeof branch.manager === 'object' ? branch.manager?._id : (branch.manager || '')
         });
         setIsEditModalOpen(true);
+        setActiveActionDropdown(null);
+    };
+
+    const handleViewInvestors = async (branch: Branch) => {
+        setSelectedBranchForInvestors(branch);
+        setIsInvestorsModalOpen(true);
+        setIsFetchingInvestors(true);
+        setActiveActionDropdown(null);
+        try {
+            const response = await getInvestors(1, 100, { branchId: branch._id });
+            setBranchInvestors(response.items);
+        } catch (err) {
+            toast.error('Failed to fetch linked investors');
+            console.error(err);
+        } finally {
+            setIsFetchingInvestors(false);
+        }
     };
 
     const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -211,13 +235,40 @@ const ManageBranches = () => {
                                         </span>
                                     </td>
                                     <td className="px-6 py-6 text-right">
-                                        <button
-                                            onClick={() => handleEditClick(branch)}
-                                            className="p-2 text-gray-400 hover:text-swamp-deer hover:bg-swamp-deer/5 rounded-lg transition-all"
-                                            title="Edit Branch"
-                                        >
-                                            <span className="material-symbols-outlined text-[20px]">edit_square</span>
-                                        </button>
+                                        <div className="relative inline-block text-left">
+                                            <button
+                                                onClick={() => setActiveActionDropdown(activeActionDropdown === branch._id ? null : branch._id)}
+                                                className="p-2 text-gray-400 hover:text-swamp-deer hover:bg-swamp-deer/5 rounded-lg transition-all"
+                                                title="Actions"
+                                            >
+                                                <span className="material-symbols-outlined text-[24px]">more_vert</span>
+                                            </button>
+
+                                            {activeActionDropdown === branch._id && (
+                                                <>
+                                                    <div
+                                                        className="fixed inset-0 z-10"
+                                                        onClick={() => setActiveActionDropdown(null)}
+                                                    ></div>
+                                                    <div className="absolute right-0 mt-2 w-48 bg-white border border-border-light rounded-xl shadow-xl z-20 py-2 animate-in fade-in zoom-in duration-200">
+                                                        <button
+                                                            onClick={() => handleEditClick(branch)}
+                                                            className="w-full text-left px-4 py-2 text-sm font-bold text-gray-700 hover:bg-neutral-light flex items-center gap-2"
+                                                        >
+                                                            <span className="material-symbols-outlined text-sm">edit_square</span>
+                                                            Edit Details
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleViewInvestors(branch)}
+                                                            className="w-full text-left px-4 py-2 text-sm font-bold text-gray-700 hover:bg-neutral-light flex items-center gap-2"
+                                                        >
+                                                            <span className="material-symbols-outlined text-sm">group</span>
+                                                            Linked Investors
+                                                        </button>
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -377,6 +428,107 @@ const ManageBranches = () => {
                     </div>
                 </div>
             )}
+
+            {/* Linked Investors Modal */}
+            {isInvestorsModalOpen && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
+                    <div className="bg-white rounded-[32px] w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl animate-in zoom-in duration-300 flex flex-col">
+                        <div className="p-8 border-b border-border-light flex items-center justify-between bg-neutral-light/30">
+                            <div>
+                                <h3 className="text-xl font-black text-forest-green italic tracking-tight">
+                                    Linked Investors: <span className="text-gray-900 not-italic ml-2">{selectedBranchForInvestors?.name}</span>
+                                </h3>
+                                <p className="text-xs font-medium text-gray-400 mt-1 uppercase tracking-widest">Showing all investors registered under this branch</p>
+                            </div>
+                            <button
+                                onClick={() => setIsInvestorsModalOpen(false)}
+                                className="w-10 h-10 rounded-full hover:bg-white flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors shadow-sm"
+                            >
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+
+                        <div className="flex-1 overflow-auto p-8">
+                            {isFetchingInvestors ? (
+                                <div className="py-20 text-center flex flex-col items-center gap-4">
+                                    <div className="size-12 border-4 border-forest-green/20 border-t-forest-green rounded-full animate-spin"></div>
+                                    <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest">Loading Investors...</p>
+                                </div>
+                            ) : branchInvestors.length > 0 ? (
+                                <div className="border border-border-light rounded-2xl overflow-hidden shadow-sm">
+                                    <table className="w-full text-left border-collapse">
+                                        <thead className="bg-[#f9fafb] text-[#6b7280] border-b border-border-light">
+                                            <tr>
+                                                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.15em]">Investor Name</th>
+                                                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.15em]">Contact Info</th>
+                                                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.15em]">Total Invested</th>
+                                                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-[0.15em]">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-border-light">
+                                            {branchInvestors.map((investor) => (
+                                                <tr key={investor._id} className="hover:bg-neutral-light/50 transition-colors group">
+                                                    <td className="px-6 py-5">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className="w-9 h-9 rounded-full bg-forest-green text-white flex items-center justify-center text-sm font-black uppercase">
+                                                                {investor.name?.charAt(0) || '?'}
+                                                            </div>
+                                                            <div className="flex flex-col">
+                                                                <span className="font-bold text-gray-900">{investor.name}</span>
+                                                                <span className="text-[10px] text-gray-400 uppercase font-bold tracking-tighter italic">UID: {investor.userName}</span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-5">
+                                                        <div className="flex flex-col gap-1">
+                                                            <div className="flex items-center gap-2 text-xs text-gray-600 font-medium">
+                                                                <span className="material-symbols-outlined text-[14px]">mail</span>
+                                                                {investor.email}
+                                                            </div>
+                                                            <div className="flex items-center gap-2 text-xs text-gray-600 font-medium">
+                                                                <span className="material-symbols-outlined text-[14px]">call</span>
+                                                                {investor.phone}
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-5">
+                                                        <span className="text-sm font-black text-gray-900">
+                                                            Rs {(investor.amountInvested || 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                                                        </span>
+                                                    </td>
+                                                    <td className="px-6 py-5">
+                                                        <span className={clsx(
+                                                            "px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border",
+                                                            investor.status === 'active' ? "bg-green-50 text-green-600 border-green-200" : "bg-red-50 text-red-600 border-red-200"
+                                                        )}>
+                                                            {investor.status}
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            ) : (
+                                <div className="p-20 text-center flex flex-col items-center gap-3">
+                                    <span className="material-symbols-outlined text-4xl text-gray-200">person_off</span>
+                                    <p className="text-[11px] font-black text-gray-400 uppercase tracking-widest italic">No investors linked to this branch yet</p>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="p-8 border-t border-border-light bg-neutral-light/10">
+                            <button
+                                onClick={() => setIsInvestorsModalOpen(false)}
+                                className="w-full px-8 py-4 rounded-2xl bg-forest-green text-white text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-forest-green/20 hover:bg-deep-green transition-all"
+                            >
+                                Close View
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 };

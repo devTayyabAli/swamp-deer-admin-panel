@@ -12,6 +12,7 @@ export default function InvestorTeamPage() {
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<TeamType>('all');
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedLevel, setSelectedLevel] = useState<string>('all');
     const [teamData, setTeamData] = useState<InvestorTeam | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -44,7 +45,10 @@ export default function InvestorTeamPage() {
         const email = member.email || '';
         const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             email.toLowerCase().includes(searchTerm.toLowerCase());
-        return matchesSearch;
+
+        const matchesLevel = selectedLevel === 'all' || member.level?.toString() === selectedLevel;
+
+        return matchesSearch && matchesLevel;
     });
 
     if (isLoading) {
@@ -169,15 +173,27 @@ export default function InvestorTeamPage() {
                     </button>
                 </div>
 
-                <div className="relative flex-1 w-full xl:max-w-md">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                        type="text"
-                        placeholder="Scan entries by name or email identifier..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-12 pr-4 py-4 bg-white border border-border-light rounded-2xl focus:ring-2 focus:ring-forest-green/10 focus:border-forest-green transition-all outline-none text-sm font-bold shadow-sm"
-                    />
+                <div className="flex flex-col sm:flex-row gap-4 flex-1 w-full xl:max-w-2xl">
+                    <div className="relative flex-1">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="Scan entries by name or email identifier..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full pl-12 pr-4 py-4 bg-white border border-border-light rounded-2xl focus:ring-2 focus:ring-forest-green/10 focus:border-forest-green transition-all outline-none text-sm font-bold shadow-sm"
+                        />
+                    </div>
+                    <select
+                        value={selectedLevel}
+                        onChange={(e) => setSelectedLevel(e.target.value)}
+                        className="px-4 py-4 bg-white border border-border-light rounded-2xl focus:ring-2 focus:ring-forest-green/10 focus:border-forest-green transition-all outline-none text-sm font-bold shadow-sm min-w-[140px]"
+                    >
+                        <option value="all">Every Level</option>
+                        {Array.from({ length: 8 }, (_, i) => (
+                            <option key={i + 1} value={i + 1}>Tier Level {i + 1}</option>
+                        ))}
+                    </select>
                 </div>
             </div>
 
@@ -188,6 +204,7 @@ export default function InvestorTeamPage() {
                         <thead className="bg-neutral-light/50 border-b border-border-light">
                             <tr>
                                 <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] whitespace-nowrap">Node Identity</th>
+                                <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] whitespace-nowrap text-center">Level</th>
                                 <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] whitespace-nowrap">Capital Valuation</th>
                                 <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] whitespace-nowrap">Deployment Date</th>
                                 <th className="px-8 py-5 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] whitespace-nowrap">Upline Reference</th>
@@ -207,6 +224,11 @@ export default function InvestorTeamPage() {
                                                 <div className="text-sm font-black text-gray-900 tracking-tight">{member.name || (member as any).fullName}</div>
                                                 <div className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{member.email || (member as any).phone}</div>
                                             </div>
+                                        </div>
+                                    </td>
+                                    <td className="px-8 py-5 text-center">
+                                        <div className="inline-flex items-center px-2 py-1 bg-forest-green/5 text-forest-green rounded-lg text-[10px] font-black italic border border-forest-green/10 shadow-xs">
+                                            TIER {member.level || (member.type === 'direct' ? 1 : 2)}
                                         </div>
                                     </td>
                                     <td className="px-8 py-5">
@@ -244,7 +266,7 @@ export default function InvestorTeamPage() {
                             ))}
                             {filteredMembers.length === 0 && (
                                 <tr>
-                                    <td colSpan={6} className="px-8 py-20 text-center">
+                                    <td colSpan={7} className="px-8 py-20 text-center">
                                         <div className="flex flex-col items-center gap-4 text-gray-300">
                                             <div className="p-4 bg-neutral-light rounded-full">
                                                 <Users className="w-12 h-12 opacity-30" />

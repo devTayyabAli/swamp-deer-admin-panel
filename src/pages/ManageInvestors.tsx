@@ -7,7 +7,8 @@ import { toggleInvestorStatus, updateUser, getInvestorRewards, getSales } from '
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import type { Investor, Sale } from '../types';
-import { Calendar, Coins, History, TrendingUp, Users2, Wallet, Edit3, UserCheck, UserMinus, MoreHorizontal } from 'lucide-react';
+import { Calendar, Coins, History, TrendingUp, Users2, Wallet, Edit3, UserCheck, UserMinus, MoreHorizontal, Network } from 'lucide-react';
+import InvestorTreeViewModal from '../components/InvestorTreeViewModal';
 
 interface EditInvestorModalProps {
     investor: Investor;
@@ -506,6 +507,7 @@ const ActionDropdown = ({
     onViewTeam,
     onViewRewards,
     onViewInvestments,
+    onViewTreeView,
     onEdit,
     onToggleStatus
 }: {
@@ -513,6 +515,7 @@ const ActionDropdown = ({
     onViewTeam: (id: string) => void;
     onViewRewards: (investor: Investor) => void;
     onViewInvestments: (investor: Investor) => void;
+    onViewTreeView: (investor: Investor) => void;
     onEdit: (investor: Investor) => void;
     onToggleStatus: (id: string) => void;
 }) => {
@@ -556,6 +559,16 @@ const ActionDropdown = ({
                                 <Users2 className="w-4 h-4" />
                             </div>
                             <span className="text-xs font-bold text-gray-600 group-hover:text-forest-green transition-colors tracking-tight">View Team Network</span>
+                        </button>
+
+                        <button
+                            onClick={() => { onViewTreeView(investor); setIsOpen(false); }}
+                            className="w-full flex items-center gap-3 px-3 py-2 rounded-2xl text-left hover:bg-forest-green/5 group transition-all"
+                        >
+                            <div className="w-8 h-8 rounded-xl bg-forest-green/10 flex items-center justify-center text-forest-green group-hover:bg-forest-green group-hover:text-white transition-all shadow-sm">
+                                <Network className="w-4 h-4" />
+                            </div>
+                            <span className="text-xs font-bold text-gray-600 group-hover:text-forest-green transition-colors tracking-tight">View Tree Hierarchy</span>
                         </button>
 
                         <button
@@ -636,6 +649,8 @@ const ManageInvestors = () => {
     const [editingInvestor, setEditingInvestor] = useState<Investor | null>(null);
     const [viewingRewardsInvestor, setViewingRewardsInvestor] = useState<Investor | null>(null);
     const [viewingInvestmentsInvestor, setViewingInvestmentsInvestor] = useState<Investor | null>(null);
+    const [viewingTreeViewInvestor, setViewingTreeViewInvestor] = useState<Investor | null>(null);
+    const [isTreeViewModalOpen, setIsTreeViewModalOpen] = useState(false);
 
     // Calculate dates based on filter type
     useEffect(() => {
@@ -931,6 +946,10 @@ const ManageInvestors = () => {
                                                     onViewTeam={handleViewTeam}
                                                     onViewRewards={setViewingRewardsInvestor}
                                                     onViewInvestments={setViewingInvestmentsInvestor}
+                                                    onViewTreeView={(investor) => {
+                                                        setViewingTreeViewInvestor(investor);
+                                                        setIsTreeViewModalOpen(true);
+                                                    }}
                                                     onEdit={setEditingInvestor}
                                                     onToggleStatus={handleToggleStatus}
                                                 />
@@ -1008,6 +1027,18 @@ const ManageInvestors = () => {
                 <InvestmentHistoryModal
                     investor={viewingInvestmentsInvestor}
                     onClose={() => setViewingInvestmentsInvestor(null)}
+                />
+            )}
+
+            {isTreeViewModalOpen && viewingTreeViewInvestor && (
+                <InvestorTreeViewModal
+                    isOpen={isTreeViewModalOpen}
+                    onClose={() => {
+                        setIsTreeViewModalOpen(false);
+                        setViewingTreeViewInvestor(null);
+                    }}
+                    investorId={viewingTreeViewInvestor._id}
+                    investorName={viewingTreeViewInvestor.fullName}
                 />
             )}
         </div>

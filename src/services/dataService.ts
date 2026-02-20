@@ -16,11 +16,13 @@ export const createBranch = async (branchData: Omit<Branch, '_id'>): Promise<Bra
     return response.data;
 };
 
-export const getInvestors = async (page = 1, limit = 10, filters: { startDate?: string, endDate?: string, search?: string } = {}): Promise<PaginatedResponse<Investor>> => {
+export const getInvestors = async (page = 1, limit = 10, filters: { startDate?: string, endDate?: string, search?: string, branchId?: string } = {}): Promise<PaginatedResponse<Investor>> => {
     let url = `/investors?page=${page}&limit=${limit}`;
     if (filters.startDate) url += `&startDate=${filters.startDate}`;
     if (filters.endDate) url += `&endDate=${filters.endDate}`;
     if (filters.search) url += `&search=${filters.search}`;
+    if (filters.branchId) url += `&branchId=${filters.branchId}`;
+
 
     const response = await api.get<PaginatedResponse<Investor>>(url);
     return response.data;
@@ -72,6 +74,7 @@ export interface TeamMember extends Partial<Investor> {
     date: string;
     upline: string;
     type: 'direct' | 'indirect';
+    level?: number;
 }
 
 export interface InvestorTeam {
