@@ -165,7 +165,7 @@ const ApproveWithdrawals = () => {
                                         <td className="px-6 py-4">
                                             <div className="flex flex-col">
                                                 <span className="text-sm font-bold text-gray-900">Rs {request.amount.toLocaleString()}</span>
-                                                <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">Net: Rs {(request.amount * 0.95).toLocaleString()}</span>
+
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
@@ -300,13 +300,9 @@ const ApproveWithdrawals = () => {
                                         <p className="text-[10px] font-black text-gray-400 uppercase tracking-tighter">Gross Amount</p>
                                         <p className="text-lg font-black text-gray-900">Rs {selectedRequest.amount.toLocaleString()}</p>
                                     </div>
-                                    <div className="space-y-1 text-right">
-                                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-tighter text-red-500">Service Fee (5%)</p>
-                                        <p className="text-sm font-bold text-red-500">-Rs {(selectedRequest.amount * 0.05).toLocaleString()}</p>
-                                    </div>
                                     <div className="space-y-1 col-span-2 border-t border-gray-200 pt-3 flex justify-between items-center">
-                                        <p className="text-sm font-black uppercase text-gray-600">Net Payable</p>
-                                        <p className="text-xl font-black text-emerald-600">Rs {(selectedRequest.amount * 0.95).toLocaleString()}</p>
+                                        <p className="text-sm font-black uppercase text-gray-600">Total Payable</p>
+                                        <p className="text-xl font-black text-emerald-600">Rs {selectedRequest.amount.toLocaleString()}</p>
                                     </div>
                                 </div>
                             </div>
